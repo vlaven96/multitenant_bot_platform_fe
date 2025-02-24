@@ -1,0 +1,45 @@
+.table-container {
+    width: 100%;
+    height: 400px; /* Set a fixed height for vertical scrolling */
+    overflow: auto; /* Allow both horizontal and vertical scrolling */
+  }
+  
+  .table {
+    width: max-content; /* Allow the table to expand based on content */
+    min-width: 100%; /* Ensure the table takes at least the full width of the container */
+  }
+  
+  th, td {
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+  
+  a {
+    color: blue; /* Link color */
+    text-decoration: underline; /* Underline links */
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+  }
+  
+  .add-model-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-width: 90%;
+  }
+  
+  .add-model-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+  } 

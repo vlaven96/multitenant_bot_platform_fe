@@ -1,0 +1,59 @@
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  margin-bottom: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.numbered-textarea-container {
+  margin-top: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.error-message {
+  color: #dc3545;
+  margin-top: 0.5rem;
+}
+
+/* Select container styles */
+.basic-select {
+  position: relative;
+}
+
+/* Specific z-index for each select */
+.model-select {
+  z-index: 4;
+}
+
+.chatbot-select {
+  z-index: 3;
+}
+
+.source-select {
+  z-index: 2;
+}
+
+/* Style for the select menu portal */
+.select__menu-portal {
+  z-index: 9999 !important;
+} 
