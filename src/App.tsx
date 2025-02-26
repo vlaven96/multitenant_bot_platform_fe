@@ -22,6 +22,8 @@ import SnapchatAccountDetails from './components/user/SnapchatAccountDetails';
 import Workflows from './components/admin/workflow/Workflows';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Statistics from './components/admin/Statistics';
+import RegisterAgency from './components/RegisterAgency';
+import RegisterUser from './components/RegisterUser';
 
 function App() {
   const isAdmin = JSON.parse(localStorage.getItem('is_admin') || 'false');
@@ -32,7 +34,7 @@ function App() {
       {isAuthenticated && <Header isAdmin={isAdmin} />}
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* <Route path="/register" element={<Register />} /> */}
         <Route path="/admin" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminHome /></PrivateRoute>} />
         <Route path="/admin/users" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Users /></PrivateRoute>} />
         <Route path="/admin/proxies" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Proxies /></PrivateRoute>} />
@@ -50,6 +52,8 @@ function App() {
         <Route path="/user/executions/:id" element={<PrivateRoute isAuthenticated={isAuthenticated}><ExecutionDetails /></PrivateRoute>} />
         <Route path="/snapchat-account/:accountId" element={<PrivateRoute isAuthenticated={isAuthenticated}><SnapchatAccountDetails /></PrivateRoute>} />
         <Route path="/" element={isAuthenticated ? (isAdmin ? <AdminHome /> : <UserHome />) : <Home />} />
+        <Route path="/register-agency" element={<RegisterAgency />} />
+        <Route path="/register" element={<RegisterUser />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <ToastContainer />

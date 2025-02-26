@@ -12,9 +12,8 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { access_token, is_admin } = await login(username, password);
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('is_admin', JSON.stringify(is_admin));
+      await login(username, password);
+
       toast.success('Login successful!', {
         position: "top-right",
         autoClose: 3000,
