@@ -34,6 +34,7 @@ interface BulkUpdateModalProps {
     modelId?: number;
     chatBotId?: number;
   }) => void;
+  agencyId: string;
 }
 
 /**
@@ -43,7 +44,7 @@ interface BulkUpdateModalProps {
  * - Model (populated from fetchModels)
  * - ChatBot (just a numeric ID input in this example)
  */
-const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ isOpen, onClose, onConfirm }) => {
+const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ isOpen, onClose, onConfirm, agencyId }) => {
   // Control which fields are updated
   const [updateStatus, setUpdateStatus] = useState(false);
   const [updateTags, setUpdateTags] = useState(false);
@@ -93,19 +94,19 @@ const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ isOpen, onClose, onCo
   const fetchAllData = async () => {
     try {
       // fetch tags
-      const tagList = await fetchTags();
+      const tagList = await fetchTags(agencyId);
       setAvailableTags(tagList);
 
       // fetch statuses
-      const statusList = await fetchStatuses();
+      const statusList = await fetchStatuses(agencyId);
       // Make sure statusList is an array of strings
       setAvailableStatuses(statusList);
 
       // fetch models
-      const fetchedModels = await fetchModels();
+      const fetchedModels = await fetchModels(agencyId);
       setModels(fetchedModels);
 
-      const fetchedChatbots = await fetchChatbots();
+      const fetchedChatbots = await fetchChatbots(agencyId);
       setChatbots(fetchedChatbots);
     } catch (err) {
       console.error('Error fetching data for BulkUpdateModal:', err);

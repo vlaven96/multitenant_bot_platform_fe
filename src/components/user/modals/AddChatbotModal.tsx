@@ -7,9 +7,10 @@ interface AddChatbotModalProps {
   onSubmit: (type: string, token: string) => void;
   isEditMode: boolean;
   chatbot?: { id: string; type: string; token: string };
+  agencyId: string;
 }
 
-const AddChatbotModal: React.FC<AddChatbotModalProps> = ({ isOpen, onRequestClose, onSubmit, isEditMode, chatbot }) => {
+const AddChatbotModal: React.FC<AddChatbotModalProps> = ({ isOpen, onRequestClose, onSubmit, isEditMode, chatbot , agencyId}) => {
   const [type, setName] = React.useState(chatbot?.type || '');
   const [token, setToken] = React.useState(chatbot?.token || '');
 

@@ -37,7 +37,13 @@ interface SnapchatAccountTimelineStatistics {
   status_changes: StatusChange[];
 }
 
+// Function to get the agency ID from localStorage
+const getAgencyId = () => {
+  return localStorage.getItem("agency_id");
+};
+
 export const fetchAccounts = async (
+  agencyId: string,
   navigate: Function,
   username?: string,
   creationDateFrom?: string,
@@ -48,6 +54,9 @@ export const fetchAccounts = async (
   statuses?: string[],
   includeExecutions?: boolean
 ) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const params: any = {};
     if (username !== undefined) params.username = username;
@@ -61,33 +70,42 @@ export const fetchAccounts = async (
       params.statuses = statuses;
     if (includeExecutions !== undefined)
       params.include_executions = includeExecutions;
-    const response = await axios.get(`${API_URL}/accounts`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-      params,
-      paramsSerializer: (params) => {
-        return qs.stringify(params, { arrayFormat: "repeat" });
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/agencies/${agencyId}/accounts`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+        params,
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: "repeat" });
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     handleApiError(error, navigate);
   }
 };
 
-export const addAccount = async (accountData: {
-  data: string;
-  model_id?: number | null;
-  chatbot_id?: number | null;
-  source?: string;
-  workflow_id?: number | null;
-  trigger_execution?: boolean;
-  pattern?: string | null;
-}) => {
+export const addAccount = async (
+  agencyId: string,
+  accountData: {
+    data: string;
+    model_id?: number | null;
+    chatbot_id?: number | null;
+    source?: string;
+    workflow_id?: number | null;
+    trigger_execution?: boolean;
+    pattern?: string | null;
+  }
+) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.post(
-      `${API_URL}/accounts`,
+      `${API_URL}/agencies/${agencyId}/accounts`,
       {
         payload: {
           data: accountData.data,
@@ -114,10 +132,13 @@ export const addAccount = async (accountData: {
   }
 };
 
-export const terminateAccount = async (accountId: string) => {
+export const terminateAccount = async (agencyId: string, accountId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.patch(
-      `${API_URL}/accounts/${accountId}`,
+      `${API_URL}/agencies/${agencyId}/accounts/${accountId}`,
       { status: "TERMINATED" },
       {
         headers: {
@@ -132,15 +153,21 @@ export const terminateAccount = async (accountId: string) => {
   }
 };
 
-export const fetchAccountForEdit = async (id: string) => {
+export const fetchAccountForEdit = async (agencyId: string, id: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await fetch(`${API_URL}/accounts/${id}/edit`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${API_URL}/agencies/${agencyId}/accounts/${id}/edit`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch account details");
@@ -154,6 +181,7 @@ export const fetchAccountForEdit = async (id: string) => {
 };
 
 export const updateAccount = async (
+  agencyId: string,
   id: string,
   data: {
     model_id: number | null;
@@ -164,13 +192,20 @@ export const updateAccount = async (
     tags: string[];
   }
 ) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.patch(`${API_URL}/accounts/${id}`, data, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.patch(
+      `${API_URL}/agencies/${agencyId}/accounts/${id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error: any) {
     console.error("Failed to update account:", error);
@@ -178,13 +213,19 @@ export const updateAccount = async (
   }
 };
 
-export const fetchAccountDetails = async (id: string) => {
+export const fetchAccountDetails = async (agencyId: string, id: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/accounts/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/agencies/${agencyId}/accounts/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching account details:", error);
@@ -192,14 +233,20 @@ export const fetchAccountDetails = async (id: string) => {
   }
 };
 
-export const fetchStatuses = async () => {
+export const fetchStatuses = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/accounts/statuses/list`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/agencies/${agencyId}/accounts/statuses/list`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching statuses:", error);
@@ -207,10 +254,13 @@ export const fetchStatuses = async () => {
   }
 };
 
-export const fetchTerminationCandidates = async () => {
+export const fetchTerminationCandidates = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.get(
-      `${API_URL}/accounts/candidates-for-termination`,
+      `${API_URL}/agencies/${agencyId}/accounts/candidates-for-termination`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -225,10 +275,16 @@ export const fetchTerminationCandidates = async () => {
   }
 };
 
-export const terminateMultipleAccounts = async (accountIds: string[]) => {
+export const terminateMultipleAccounts = async (
+  agencyId: string,
+  accountIds: string[]
+) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.patch(
-      `${API_URL}/accounts/terminate`,
+      `${API_URL}/agencies/${agencyId}/accounts/terminate`,
       accountIds,
       {
         headers: {
@@ -238,33 +294,43 @@ export const terminateMultipleAccounts = async (accountIds: string[]) => {
       }
     );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error terminating accounts:", error);
     throw error;
   }
 };
 
-export const fetchSources = async () => {
+export const fetchSources = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/accounts/sources/list`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.get(
+      `${API_URL}/agencies/${agencyId}/accounts/sources/list`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching sources:", error);
     throw error;
   }
 };
 
 export const fetchAccountStatistics = async (
+  agencyId: string,
   accountId: string
 ): Promise<SnapchatAccountStats> => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.get(
-      `${API_URL}/accounts/${accountId}/statistics`,
+      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/statistics`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -279,11 +345,15 @@ export const fetchAccountStatistics = async (
 };
 
 export const fetchAccountTimelineStatistics = async (
+  agencyId: string,
   accountId: string
 ): Promise<SnapchatAccountTimelineStatistics> => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.get(
-      `${API_URL}/accounts/${accountId}/timeline-statistics`,
+      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/timeline-statistics`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -297,21 +367,27 @@ export const fetchAccountTimelineStatistics = async (
   }
 };
 
-export async function bulkUpdateAccounts(payload: {
-  account_ids: number[];
-  status?: string;
-  tags_to_add?: string[];
-  tags_to_remove?: string[];
-  model_id?: number;
-  chat_bot_id?: number;
-}) {
+export async function bulkUpdateAccounts(
+  agencyId: string,
+  payload: {
+    account_ids: number[];
+    status?: string;
+    tags_to_add?: string[];
+    tags_to_remove?: string[];
+    model_id?: number;
+    chat_bot_id?: number;
+  }
+) {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   const headers = {
     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
     "Content-Type": "application/json",
   };
   // Adjust the API endpoint / method as needed
   const { data } = await axios.patch(
-    `${API_URL}/accounts/bulk-update`,
+    `${API_URL}/agencies/${agencyId}/accounts/bulk-update`,
     payload,
     { headers }
   );

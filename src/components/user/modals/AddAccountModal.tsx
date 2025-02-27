@@ -36,9 +36,10 @@ const customStyles = {
 interface AddAccountModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
+  agencyId: string;
 }
 
-const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClose }) => {
+const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClose, agencyId }) => {
   const [inputText, setInputText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [models, setModels] = useState<any[]>([]);
@@ -57,10 +58,10 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClos
     const loadData = async () => {
       try {
         const [modelsData, chatbotsData, workflowsData, sourcesData] = await Promise.all([
-          fetchModels(),
-          fetchChatbots(),
-          fetchWorkflowsSimplified(),
-          fetchSources()
+          fetchModels(agencyId),
+          fetchChatbots(agencyId),
+          fetchWorkflowsSimplified(agencyId),
+          fetchSources(agencyId)
         ]);
         
         setModels([
@@ -120,7 +121,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClos
         pattern: enablePattern ? pattern : undefined,
       };
 
-      await addAccount(accountData);
+      await addAccount(agencyId, accountData);
       toast.success("Account added successfully!", {
         position: "top-right",
         autoClose: 3000,

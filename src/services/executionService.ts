@@ -3,7 +3,7 @@ import { clearAuthData } from "./authService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const executeOperation = async (params: {
+export const executeOperation = async (agencyId: string, params: {
   userIds: number[];
   operationType: string;
   startingDelay?: number;
@@ -48,7 +48,7 @@ export const executeOperation = async (params: {
       accounts: params.userIds,
     };
 
-    const response = await axios.post(`${API_URL}/executions`, payload, {
+    const response = await axios.post(`${API_URL}/agencies/${agencyId}/executions`, payload, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -64,6 +64,7 @@ export const executeOperation = async (params: {
 };
 
 export const fetchExecutions = async (
+  agencyId: string,
   offset: number,
   limit: number,
   username?: string,
@@ -78,7 +79,7 @@ export const fetchExecutions = async (
     if (executionType) params.execution_type = executionType;
     if (jobId) params.job_id = jobId;
 
-    const response = await axios.get(`${API_URL}/executions`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/executions`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -94,9 +95,9 @@ export const fetchExecutions = async (
   }
 };
 
-export const fetchExecutionDetails = async (id: string) => {
+export const fetchExecutionDetails = async (agencyId: string, id: string) => {
   try {
-    const response = await axios.get(`${API_URL}/executions/${id}`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/executions/${id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -112,6 +113,7 @@ export const fetchExecutionDetails = async (id: string) => {
 };
 
 export const fetchExecutionDetailsByAccount = async (
+  agencyId: string,
   id: string,
   limit: number,
   offset: number,
@@ -123,7 +125,7 @@ export const fetchExecutionDetailsByAccount = async (
       params.execution_type = executionType;
 
     const response = await axios.get(
-      `${API_URL}/executions/by_snapchat_account/${id}`,
+      `${API_URL}/agencies/${agencyId}/executions/by_snapchat_account/${id}`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -137,6 +139,44 @@ export const fetchExecutionDetailsByAccount = async (
     if (error.response && error.response.status === 401) {
       clearAuthData();
     }
+    throw error;
+  }
+};
+
+export const addExecution = async (agencyId: string, executionData: any) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
+  try {
+    const response = await axios.post(
+      `${API_URL}/agencies/${agencyId}/executions`,
+      executionData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error adding execution:", error);
+    throw error;
+  }
+};
+
+export const deleteExecution = async (agencyId: string, executionId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
+  try {
+    const response = await axios.delete(`${API_URL}/agencies/${agencyId}/executions/${executionId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting execution:", error);
     throw error;
   }
 };

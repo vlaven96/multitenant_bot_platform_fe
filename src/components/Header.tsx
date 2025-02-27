@@ -1,5 +1,7 @@
 import React from 'react';
+import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import MenuIcon from '@mui/icons-material/Menu';
 import { logout } from '../services/authService';
 
 interface HeaderProps {
@@ -8,6 +10,16 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isAdmin }) => {
   const navigate = useNavigate();
+  const agencyId = localStorage.getItem('agency_id');
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
     logout();
@@ -15,69 +27,74 @@ const Header: React.FC<HeaderProps> = ({ isAdmin }) => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">Home</Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
-            {isAdmin ? (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/jobs">Jobs</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/workflows">Workflows</Link>
-                </li>
-               <li className="nav-item">
-                  <Link className="nav-link" to="/user/manual-operations">Manual Operations</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/user/executions">Executions</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/user">User Dashboard</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/users">Manage Users</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/proxies">Manage Proxies</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/accounts">Manage Accounts</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/models">Manage Models</Link>
-                </li> 
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/chatbots">Manage Chatbots</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/statistics">Statistics</Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/user/manual-operations">Manual Operations</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/user/executions">Executions</Link>
-                </li>
-              </>
-            )}
-          </ul>
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
-            </li>
-          </ul>
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Link to={`/agency/${agencyId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            Dashboard
+          </Link>
+        </Typography>
+        <div>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+            onClick={handleMenu}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/jobs`} style={{ textDecoration: 'none', color: 'inherit' }}>Jobs</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/workflows`} style={{ textDecoration: 'none', color: 'inherit' }}>Workflows</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/manual-operations`} style={{ textDecoration: 'none', color: 'inherit' }}>Manual Operations</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/executions`} style={{ textDecoration: 'none', color: 'inherit' }}>Executions</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/admin/users`} style={{ textDecoration: 'none', color: 'inherit' }}>Manage Users</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/proxies`} style={{ textDecoration: 'none', color: 'inherit' }}>Manage Proxies</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/accounts`} style={{ textDecoration: 'none', color: 'inherit' }}>Manage Accounts</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/models`} style={{ textDecoration: 'none', color: 'inherit' }}>Manage Models</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/chatbots`} style={{ textDecoration: 'none', color: 'inherit' }}>Manage Chatbots</Link>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link to={`/agency/${agencyId}/statistics`} style={{ textDecoration: 'none', color: 'inherit' }}>Statistics</Link>
+            </MenuItem>
+          </Menu>
+          <Button color="inherit" onClick={handleLogout}>Logout</Button>
         </div>
-      </div>
-    </nav>
+      </Toolbar>
+    </AppBar>
   );
 };
 

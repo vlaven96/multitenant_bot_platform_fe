@@ -47,6 +47,7 @@ interface AccountExecutionResult {
 
 const ExecutionDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { agencyId } = useParams<{ agencyId: string }>();
   const navigate = useNavigate();
   const [execution, setExecution] = useState<Execution | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +55,11 @@ const ExecutionDetails: React.FC = () => {
   useEffect(() => {
     const loadExecutionDetails = async () => {
       try {
-        const data = await fetchExecutionDetails(id!);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const data = await fetchExecutionDetails(agencyId, id!);
         setExecution(data);
       } catch (error) {
         toast.error('Failed to fetch execution details');
@@ -89,7 +94,7 @@ const ExecutionDetails: React.FC = () => {
   return (
     <div className="execution-details-container">
       <div className="header">
-        <button onClick={() => navigate('/user/executions')} className="btn btn-secondary">
+        <button onClick={() => navigate(`/agency/${agencyId}/executions`)} className="btn btn-secondary">
           Back to Executions
         </button>
         <h2>Execution Details #{execution.id}</h2>

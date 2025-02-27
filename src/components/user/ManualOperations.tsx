@@ -23,7 +23,7 @@ import InfoModal from '../Modal';
 import { fetchAccounts, updateAccount } from '../../services/accountsService';
 import { executeOperation } from '../../services/executionService';
 import { fetchTags } from '../../services/tagsService';
-
+import { useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ManualOperations.css';
@@ -75,7 +75,7 @@ function CustomFooter() {
 
 const ManualOperations: React.FC = () => {
   const navigate = useNavigate();
-
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -150,8 +150,13 @@ const ManualOperations: React.FC = () => {
   useEffect(() => {
     const loadAccounts = async () => {
       try {
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
         const statuses = ['GOOD_STANDING', 'RECENTLY_INGESTED', 'CAPTCHA'];
         const data = await fetchAccounts(
+          agencyId,
           navigate,
           undefined,
           undefined,
@@ -173,9 +178,13 @@ const ManualOperations: React.FC = () => {
 
   // Load existing tags
   useEffect(() => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     const loadTags = async () => {
       try {
-        const tags = await fetchTags();
+        const tags = await fetchTags(agencyId);
         setExistingTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -215,8 +224,12 @@ const ManualOperations: React.FC = () => {
 
   const handleTagsUpdate = async (rowId: string, newTags: string[]) => {
     try {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       // 1. Call your updateAccount or similar service
-      await updateAccount(rowId, {
+      await updateAccount(agencyId, rowId, {
         tags: newTags,
         // Add other fields as needed (model_id, chatbot_id, etc.)
       });
@@ -356,7 +369,11 @@ const ManualOperations: React.FC = () => {
     }
 
     try {
-      const result = await executeOperation(params);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const result = await executeOperation(agencyId, params);
       console.log('Execution result:', result);
       toast.success('Operation executed successfully.', {
         position: 'top-right',
@@ -381,26 +398,6 @@ const ManualOperations: React.FC = () => {
     }
   };
 
-  const handleNewOperation = async () => {
-    try {
-      if (maxRejectionRate === null || minConversationRate === null || minConversionRate === null) {
-        toast.error('Please fill in all parameters.');
-        return;
-      }
-
-      await executeOperation({
-        max_rejection_rate: maxRejectionRate,
-        min_conversation_rate: minConversationRate,
-        min_conversion_rate: minConversionRate,
-      });
-
-      toast.success('Operation executed successfully!');
-    } catch (error) {
-      console.error('Failed to execute operation:', error);
-      toast.error('Failed to execute operation.');
-    }
-  };
-
   // MUI DataGrid columns
   const columns = useMemo<GridColDef<Account>[]>(
     () => [
@@ -415,7 +412,7 @@ const ManualOperations: React.FC = () => {
           const row = params.row;
           return (
             <a
-              href={`/snapchat-account/${row.id}`}
+              href={`/agency/${agencyId}/snapchat-account/${row.id}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ textDecoration: 'underline', color: 'blue' }}
@@ -599,7 +596,7 @@ const ManualOperations: React.FC = () => {
           return (
             <div className="d-flex gap-2">
               <button
-                onClick={() => navigate(`/snapchat-account/${row.id}`)}
+                onClick={() => navigate(`/agency/${agencyId}/snapchat-account/${row.id}`)}
                 className="btn btn-sm btn-info"
                 style={{ padding: '4px 8px', fontSize: '12px' }}
               >

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { fetchExecutions } from '../../services/executionService';
 import { fetchSimplifiedJobs } from '../../services/jobService';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const Executions: React.FC = () => {
   const navigate = useNavigate();
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [searchParams] = useSearchParams();
   const [executions, setExecutions] = useState<any[]>([]);
   const [results, setResults] = useState<Record<string, any>[]>([]);
@@ -43,7 +44,11 @@ const Executions: React.FC = () => {
   useEffect(() => {
     const loadJobs = async () => {
       try {
-        const jobsData = await fetchSimplifiedJobs();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const jobsData = await fetchSimplifiedJobs(agencyId);
         setJobs(jobsData);
         
         // Get job ID from URL if present
@@ -63,7 +68,12 @@ const Executions: React.FC = () => {
     const loadExecutions = async () => {
       try {
         setLoading(true);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
         const data = await fetchExecutions(
+          agencyId,
           offset, 
           limit, 
           username, 
@@ -142,7 +152,7 @@ const Executions: React.FC = () => {
             <div className="d-flex gap-2">
               <button
                 className="btn btn-primary btn-sm"
-                onClick={() => window.open(`/user/executions/${execution.id}`, '_blank')}
+                onClick={() => window.open(`/agency/${agencyId}/executions/${execution.id}`, '_blank')}
               >
                 View Details
               </button>

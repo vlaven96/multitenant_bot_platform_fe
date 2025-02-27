@@ -8,10 +8,14 @@ interface Model {
   onlyfans_url: string;
 }
 const API_URL = import.meta.env.VITE_API_URL;
-// Function to fetch models from the server
-export const fetchModels = async (): Promise<Model[]> => {
+
+// Function to fetch models
+export const fetchModels = async (agencyId: string): Promise<Model[]> => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get<Model[]>(`${API_URL}/models`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/models`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -26,18 +30,20 @@ export const fetchModels = async (): Promise<Model[]> => {
   }
 };
 
-// Function to add a new model to the server
-export const addModel = async (model: Model): Promise<void> => {
+// Function to add a new model
+export const addModel = async (
+  agencyId: string,
+  modelData: any
+): Promise<void> => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    await axios.post(
-      `${API_URL}/models`,
-      { name: model.name, onlyfans_url: model.onlyfans_url },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      }
-    );
+    await axios.post(`${API_URL}/agencies/${agencyId}/models`, modelData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
   } catch (error: any) {
     console.error("Error adding model:", error);
     if (error.response && error.response.status === 401) {
@@ -47,11 +53,17 @@ export const addModel = async (model: Model): Promise<void> => {
   }
 };
 
-// Function to update a model on the server
-export const updateModel = async (model: Model): Promise<void> => {
+// Function to update a model
+export const updateModel = async (
+  agencyId: string,
+  model: Model
+): Promise<void> => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     await axios.put(
-      `${API_URL}/models/${model.id}`,
+      `${API_URL}/agencies/${agencyId}/models/${model.id}`,
       { name: model.name, onlyfans_url: model.onlyfans_url },
       {
         headers: {
@@ -68,10 +80,16 @@ export const updateModel = async (model: Model): Promise<void> => {
   }
 };
 
-// Function to delete a model from the server
-export const deleteModel = async (model: Model): Promise<void> => {
+// Function to delete a model
+export const deleteModel = async (
+  agencyId: string,
+  modelId: string
+): Promise<void> => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    await axios.delete(`${API_URL}/models/${model.id}`, {
+    await axios.delete(`${API_URL}/agencies/${agencyId}/models/${modelId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

@@ -1,8 +1,16 @@
 import React, { useRef, useState } from 'react';
-import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { addProxy } from '../../../services/proxyService';
+import { useParams } from 'react-router-dom';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from '@mui/material';
 
 interface AddProxyModalProps {
   isOpen: boolean;
@@ -10,12 +18,17 @@ interface AddProxyModalProps {
 }
 
 const AddProxyModal: React.FC<AddProxyModalProps> = ({ isOpen, onRequestClose }) => {
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [proxyText, setProxyText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async () => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      await addProxy(proxyText);
+      await addProxy(agencyId, proxyText);
       toast.success('Proxy added successfully!', {
         position: 'top-right',
         autoClose: 3000,
@@ -99,36 +112,29 @@ const AddProxyModal: React.FC<AddProxyModalProps> = ({ isOpen, onRequestClose })
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      contentLabel="Add Proxies"
-      style={{
-        content: {
-          width: '80%',
-          maxWidth: '800px',
-          height: 'fit-content',
-          margin: 'auto',
-          padding: '20px',
-        },
-      }}
+    <Dialog
+      open={isOpen}
+      onClose={onRequestClose}
+      maxWidth="md"
+      fullWidth
     >
-      <div className="modal-header">
-        <h2>Add Proxies</h2>
-      </div>
-      <div className="modal-body">
+      <DialogTitle>Add Proxy</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Enter the proxy details below.
+        </DialogContentText>
         {renderNumberedTextArea()}
         {errorMessage && <div className="text-danger mt-2">{errorMessage}</div>}
-      </div>
-      <div className="modal-footer">
-        <button className="btn btn-secondary" onClick={onRequestClose}>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onRequestClose} color="secondary">
           Cancel
-        </button>
-        <button className="btn btn-primary" onClick={handleSubmit}>
+        </Button>
+        <Button onClick={handleSubmit} color="primary">
           Add
-        </button>
-      </div>
-    </Modal>
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

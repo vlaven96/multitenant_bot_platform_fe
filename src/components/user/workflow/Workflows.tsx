@@ -5,7 +5,7 @@ import { fetchWorkflows, createWorkflow, updateWorkflow, deleteWorkflow, updateW
 import { fetchStatuses } from '../../../services/accountsService';
 import { fetchTags } from '../../../services/tagsService';
 import { toast, ToastContainer } from 'react-toastify';
-
+import { useParams } from 'react-router-dom';
 interface Step {
   id?: number;
   day_offset: string | number;
@@ -15,6 +15,7 @@ interface Step {
 
 const Workflows: React.FC = () => {
   const [workflows, setWorkflows] = useState<any[]>([]);
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [selectedWorkflow, setSelectedWorkflow] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -33,7 +34,11 @@ const Workflows: React.FC = () => {
 
   const loadWorkflows = async () => {
     try {
-      const data = await fetchWorkflows();
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchWorkflows(agencyId);
       setWorkflows(data);
     } catch (error) {
       console.error('Failed to load workflows:', error);
@@ -42,7 +47,11 @@ const Workflows: React.FC = () => {
 
   const loadStatuses = async () => {
     try {
-      const data = await fetchStatuses();
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchStatuses(agencyId);
       setStatuses(data);
     } catch (error) {
       console.error('Failed to load statuses:', error);
@@ -51,7 +60,11 @@ const Workflows: React.FC = () => {
 
   const loadTags = async () => {
     try {
-      const data = await fetchTags();
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchTags(agencyId);
       setTags(data.map((tag: string) => ({ label: tag, value: tag })));
     } catch (error) {
       console.error('Failed to load tags:', error);
@@ -113,10 +126,18 @@ const Workflows: React.FC = () => {
       };
 
       if (isEditing && selectedWorkflow) {
-        await updateWorkflow(selectedWorkflow.id, workflowData);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        await updateWorkflow(agencyId, selectedWorkflow.id, workflowData);
         toast.success('Workflow updated successfully');
       } else {
-        await createWorkflow(workflowData);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        await createWorkflow(agencyId, workflowData);
         toast.success('Workflow created successfully');
       }
       loadWorkflows();
@@ -131,7 +152,11 @@ const Workflows: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this workflow?')) {
       try {
-        await deleteWorkflow(id);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        await deleteWorkflow(agencyId, id);
         toast.success('Workflow deleted successfully');
         loadWorkflows();
       } catch (error: any) {
@@ -174,10 +199,14 @@ const Workflows: React.FC = () => {
   const handleStatusUpdate = async (workflowId: number, currentStatus: string) => {
     try {
       const newStatus = currentStatus === 'ACTIVE' ? 'STOPPED' : 'ACTIVE';
-      await updateWorkflowStatus(workflowId, newStatus);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      await updateWorkflowStatus(agencyId, workflowId, newStatus);
       toast.success('Workflow status updated successfully');
       // Refresh workflows list
-      const data = await fetchWorkflows();
+      const data = await fetchWorkflows(agencyId);
       setWorkflows(data);
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'An unknown error occurred';
@@ -188,7 +217,11 @@ const Workflows: React.FC = () => {
 
   const fetchAssociatedAccountsHandler = async (workflowId: number) => {
     try {
-      const accounts = await fetchAssociatedAccounts(workflowId);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const accounts = await fetchAssociatedAccounts(agencyId, workflowId);
       setAssociatedUsernames(accounts);
       setShowUsernamesModal(true);
     } catch (error) {
@@ -407,7 +440,7 @@ const Workflows: React.FC = () => {
           )}
         </ModalBody>
       </Modal>
-      <ToastContainer />
+
     </div>
   );
 };

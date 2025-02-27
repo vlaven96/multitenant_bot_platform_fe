@@ -25,7 +25,9 @@ function Login() {
       });
     
       // Redirect immediately after showing the toast
-      navigate(is_admin ? '/admin' : '/user');
+      const { agency_id } = await login(username, password);
+      toast.success('Login successful!');
+      navigate(`/agency/${agency_id}`); 
       window.location.reload();
     } catch (error) {
       toast.error('Login failed. Try again.', {

@@ -5,6 +5,7 @@ import './Models.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AddModelModal from './modals/AddModelModal';
+import { useParams } from 'react-router-dom';
 
 interface Model {
   id: number;
@@ -13,14 +14,19 @@ interface Model {
 }
 
 function Models() {
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [models, setModels] = useState<Model[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newModel, setNewModel] = useState<Model>({ id: 0, name: '', onlyfans_url: '' });
 
   useEffect(() => {
     const loadModels = async () => {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       try {
-        const data = await fetchModels();
+        const data = await fetchModels(agencyId);
         console.log('Fetched models:', data);
         setModels(data);
       } catch (error) {
@@ -38,7 +44,7 @@ function Models() {
     };
 
     loadModels();
-  }, []);
+  }, [agencyId]);
 
   useEffect(() => {
     console.log('Models state updated:', models);
@@ -57,10 +63,14 @@ function Models() {
   };
 
   const handleDeleteModel = async (model: Model) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     console.log('Current models before deletion:', models); 
     if (window.confirm(`Are you sure you want to delete the following model: ${model.name}?`)) {
       try {
-        await deleteModel(model);
+        await deleteModel(agencyId, model.id.toString());
         const updatedModels = models.filter(m => m.id !== model.id);
         console.log('Updated models after deletion:', updatedModels);
         setModels(updatedModels);
@@ -197,8 +207,8 @@ function Models() {
         }}
         isEditMode={isEditMode}
         model={newModel}
+        agencyId={agencyId || ''}
       />
-      <ToastContainer />
     </div>
   );
 }

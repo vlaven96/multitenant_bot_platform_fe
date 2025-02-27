@@ -1,25 +1,48 @@
-import { useEffect, useState } from 'react';
-import { fetchUsers, toggleUserActiveStatus } from '../../services/userService';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchUsers, toggleUserActiveStatus, deleteUser, inviteUser } from '../../services/userService';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material';
 
 interface UserResponse {
   id: number;
   username: string;
   email: string;
-  is_active: boolean;
-  is_admin: boolean;
+  role: string;
 }
 
-function Users() {
+const Users: React.FC = () => {
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [filteredUsers, setFilteredUsers] = useState<UserResponse[]>([]);
   const [usernameFilter, setUsernameFilter] = useState('');
-  const [isActiveFilter, setIsActiveFilter] = useState<boolean | null>(null);
+  const [open, setOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
 
-  const getUsers = async (isActive?: boolean, username?: string) => {
+  const getUsers = async (username?: string) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      const data = await fetchUsers(isActive, username);
+      const data = await fetchUsers(agencyId, undefined, username);
       setFilteredUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -27,8 +50,12 @@ function Users() {
   };
 
   const handleToggleActiveStatus = async (userId: number, isActive: boolean) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      const response = await toggleUserActiveStatus(userId, isActive);
+      const response = await toggleUserActiveStatus(agencyId, userId, isActive);
       if (response.status === 200) {
         toast.success(`User ${isActive ? 'disabled' : 'enabled'} successfully!`, {
           position: "top-right",
@@ -39,7 +66,7 @@ function Users() {
           draggable: true,
           progress: undefined,
         });
-        getUsers(isActiveFilter ?? undefined, usernameFilter); // Refresh the user list
+        getUsers(usernameFilter); // Refresh the user list
       }
     } catch (error) {
       toast.error('Error updating user status. Please try again.', {
@@ -55,77 +82,171 @@ function Users() {
     }
   };
 
+  const handleDeleteUser = async (userId: number) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
+    try {
+      await deleteUser(agencyId, userId);
+      toast.success('User deleted successfully!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      getUsers(usernameFilter); // Refresh the user list
+    } catch (error) {
+      toast.error('Error deleting user. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      console.error('Error deleting user:', error);
+    }
+  };
+
+  const handleInviteUser = async () => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inviteEmail)) {
+      toast.error('Please enter a valid email address.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+    try {
+      await inviteUser(agencyId, inviteEmail);
+      toast.success('Invitation sent successfully!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      setOpen(false);
+      setInviteEmail('');
+    } catch (error) {
+      toast.error('Error sending invitation. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      console.error('Error sending invitation:', error);
+    }
+  };
+
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [agencyId]);
 
   useEffect(() => {
-    getUsers(isActiveFilter ?? undefined, usernameFilter);
-  }, [isActiveFilter, usernameFilter]);
+    getUsers(usernameFilter);
+  }, [usernameFilter]);
 
   return (
-    <div className="container-fluid vh-100 d-flex flex-column">
-      <div className="row flex-grow-1">
-        <div className="col d-flex flex-column">
-          <ToastContainer />
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h1>Users Management</h1>
-          </div>
-          <div className="filters mb-3">
-            <input
-              type="text"
-              placeholder="Filter by username"
-              value={usernameFilter}
-              onChange={(e) => setUsernameFilter(e.target.value)}
-              className="form-control mb-2"
-            />
-            <select
-              value={isActiveFilter === null ? '' : isActiveFilter ? 'active' : 'inactive'}
-              onChange={(e) => setIsActiveFilter(e.target.value === '' ? null : e.target.value === 'active')}
-              className="form-control"
-            >
-              <option value="">All</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-          <div className="content flex-grow-1 overflow-auto">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Active</th>
-                  <th>Admin</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map(user => (
-                  <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>{user.is_active ? 'Yes' : 'No'}</td>
-                    <td>{user.is_admin ? 'Yes' : 'No'}</td>
-                    <td>
-                      <button
-                        onClick={() => handleToggleActiveStatus(user.id, user.is_active)}
-                        className={`btn ${user.is_active ? 'btn-warning' : 'btn-success'}`}
-                      >
-                        {user.is_active ? 'Disable' : 'Enable'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <Container>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Users Management
+      </Typography>
+      <Button variant="contained" color="primary" onClick={() => setOpen(true)} style={{ marginBottom: '20px' }}>
+        Invite
+      </Button>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Invite User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To invite a new user, please enter their email address here.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="outlined"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleInviteUser} color="primary">
+            Send Invite
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <div className="filters mb-3">
+        <TextField
+          label="Filter by username"
+          variant="outlined"
+          value={usernameFilter}
+          onChange={(e) => setUsernameFilter(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
       </div>
-    </div>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Username</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredUsers.map(user => (
+              <TableRow key={user.id}>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>
+                  {user.role !== 'ADMIN' && (
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleDeleteUser(user.id)}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
-}
+};
 
 export default Users; 

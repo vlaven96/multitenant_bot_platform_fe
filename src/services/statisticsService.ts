@@ -2,10 +2,50 @@ import axios from "axios";
 import { clearAuthData } from "./authService";
 
 const API_URL = import.meta.env.VITE_API_URL;
-// Function to fetch overall statistics
-export const fetchOverallStatistics = async () => {
+
+// Function to fetch statistics
+export const fetchStatistics = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/statistics`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching statistics:", error);
+    throw error;
+  }
+};
+
+// Function to fetch detailed statistics for a specific account
+export const fetchAccountStatistics = async (agencyId: string, accountId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
+  try {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/accounts/${accountId}/statistics`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching account statistics:", error);
+    throw error;
+  }
+};
+
+// Function to fetch overall statistics
+export const fetchOverallStatistics = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
+  try {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -20,9 +60,12 @@ export const fetchOverallStatistics = async () => {
   }
 };
 
-export const fetchStatusStatistics = async () => {
+export const fetchStatusStatistics = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/statistics/statuses`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/statuses`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -37,10 +80,13 @@ export const fetchStatusStatistics = async () => {
   }
 };
 
-export const fetchAverageTimesBySource = async () => {
+export const fetchAverageTimesBySource = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.get(
-      `${API_URL}/statistics/average-times-by-source`,
+      `${API_URL}/agencies/${agencyId}/statistics/average-times-by-source`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -57,10 +103,13 @@ export const fetchAverageTimesBySource = async () => {
   }
 };
 
-export const fetchExecutionCountsBySource = async () => {
+export const fetchExecutionCountsBySource = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
     const response = await axios.get(
-      `${API_URL}/statistics/execution-counts-by-source`,
+      `${API_URL}/agencies/${agencyId}/statistics/execution-counts-by-source`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -77,9 +126,12 @@ export const fetchExecutionCountsBySource = async () => {
   }
 };
 
-export const fetchGroupedByModelStatistics = async () => {
+export const fetchGroupedByModelStatistics = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/statistics/grouped-by-model`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/grouped-by-model`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -95,13 +147,14 @@ export const fetchGroupedByModelStatistics = async () => {
 };
 
 export const fetchTopSnapchatAccounts = async (
+  agencyId: string,
   weightRejectingRate: number = 0.3,
   weightConversationRate: number = 0.4,
   weightConversionRate: number = 0.3
 ) => {
   try {
     const response = await axios.get(
-      `${API_URL}/statistics/accounts_with_score`,
+      `${API_URL}/agencies/${agencyId}/statistics/accounts_with_score`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -123,9 +176,12 @@ export const fetchTopSnapchatAccounts = async (
   }
 };
 
-export const fetchDailyAccountStats = async (days: number = 7) => {
+export const fetchDailyAccountStats = async (agencyId: string, days: number = 7) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/statistics/daily-stats`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/daily-stats`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -143,9 +199,12 @@ export const fetchDailyAccountStats = async (days: number = 7) => {
   }
 };
 
-export const fetchDailyChatbotRuns = async () => {
+export const fetchDailyChatbotRuns = async (agencyId: string) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.get(`${API_URL}/statistics/daily-chatbot-runs`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/daily-chatbot-runs`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

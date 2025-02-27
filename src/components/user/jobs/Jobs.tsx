@@ -10,7 +10,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useParams } from 'react-router-dom';
 interface SelectOption {
   value: string;
   label: string;
@@ -29,6 +29,7 @@ interface Job {
 
 const Jobs: React.FC = () => {
   const navigate = useNavigate();
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -351,18 +352,26 @@ const Jobs: React.FC = () => {
         status: 'ACTIVE',
         first_execution_time: firstExecutionTimeUTC
       };
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
 
       if (isEditing && editingJobId) {
-        await updateJob(editingJobId, jobData);
+        await updateJob(agencyId, editingJobId, jobData);
         toast.success('Job updated successfully');
       } else {
-        await createJob(jobData);
+        await createJob(agencyId, jobData);
         toast.success('Job created successfully');
       }
       
       handleClose();
-      // Refresh jobs list
-      const data = await fetchJobs(['ACTIVE', 'STOPPED']);
+      // Refresh jobs list  
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
       setJobs(data);
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || 'An unknown error occurred';
@@ -374,10 +383,14 @@ const Jobs: React.FC = () => {
   const handleDeleteJob = async (jobId: number) => {
     if (window.confirm('Are you sure you want to delete this job?')) {
       try {
-        await deleteJob(jobId);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        await deleteJob(agencyId, jobId);
         toast.success('Job deleted successfully');
         // Refresh jobs list
-        const data = await fetchJobs();
+        const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
         setJobs(data);
       } catch (error) {
         toast.error('Failed to delete job. Please try again.');
@@ -388,11 +401,19 @@ const Jobs: React.FC = () => {
 
   const handleStatusUpdate = async (jobId: number, currentStatus: string) => {
     try {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       const newStatus = currentStatus === 'ACTIVE' ? 'STOPPED' : 'ACTIVE';
-      await updateJobStatus(jobId, newStatus);
+      await updateJobStatus(agencyId, jobId, newStatus);
       toast.success('Job status updated successfully');
       // Refresh jobs list
-      const data = await fetchJobs();
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
       setJobs(data);
     } catch (error) {
       toast.error('Failed to update job status. Please try again.');
@@ -407,7 +428,11 @@ const Jobs: React.FC = () => {
 
   const fetchAssociatedUsernamesHandler = async (jobId: number) => {
     try {
-      const accounts = await fetchAssociatedUsernames(jobId);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const accounts = await fetchAssociatedUsernames(agencyId, jobId);
       setAssociatedUsernames(accounts);
       setShowUsernamesModal(true);
     } catch (error) {
@@ -673,7 +698,11 @@ const Jobs: React.FC = () => {
     const loadJobs = async () => {
       try {
         setLoading(true);
-        const data = await fetchJobs(['ACTIVE', 'STOPPED']);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
         setJobs(data);
       } catch (error) {
         console.error('Failed to load jobs:', error);
@@ -684,7 +713,11 @@ const Jobs: React.FC = () => {
 
     const loadTags = async () => {
       try {
-        const tags = await fetchTags();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const tags = await fetchTags(agencyId);
         setTagsOptions(tags.map((tag: string) => ({ value: tag, label: tag })));
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -693,7 +726,11 @@ const Jobs: React.FC = () => {
 
     const loadStatuses = async () => {
       try {
-        const statuses = await fetchStatuses();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const statuses = await fetchStatuses(agencyId);
         setStatusesOptions(statuses.map((status: string) => ({ value: status, label: status })));
       } catch (error) {
         console.error('Failed to load statuses:', error);
@@ -702,7 +739,11 @@ const Jobs: React.FC = () => {
 
     const loadSources = async () => {
       try {
-        const sources = await fetchSources();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const sources = await fetchSources(agencyId);
         setSourcesOptions(sources.map((source: string) => ({
           value: source,
           label: source

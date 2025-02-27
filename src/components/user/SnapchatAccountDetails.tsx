@@ -27,6 +27,7 @@ interface SnapchatAccountTimelineStatistics {
 
 const SnapchatAccountDetails: React.FC = () => {
   const { accountId } = useParams<{ accountId: string }>();
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [account, setAccount] = useState<any>(null);
   const [executions, setExecutions] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,7 +53,11 @@ const SnapchatAccountDetails: React.FC = () => {
     const loadAccountDetails = async () => {
       if (!accountId) return;
       try {
-        const accountData = await fetchAccountDetails(accountId);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const accountData = await fetchAccountDetails(agencyId, accountId);
         setAccount(accountData);
       } catch (error) {
         console.error('Failed to load account details:', error);
@@ -62,8 +67,12 @@ const SnapchatAccountDetails: React.FC = () => {
     const loadExecutionDetails = async () => {
       if (!accountId) return;
       try {
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
         const offset = (currentPage - 1) * limit;
-        const data = await fetchExecutionDetailsByAccount(accountId, limit, offset, executionType);
+        const data = await fetchExecutionDetailsByAccount(agencyId, accountId, limit, offset, executionType);
         setExecutions(data);
       } catch (error) {
         console.error('Failed to load execution details:', error);
@@ -72,9 +81,13 @@ const SnapchatAccountDetails: React.FC = () => {
 
     const loadStatistics = async () => {
       if (!accountId) return;
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       try {
         setLoadingStats(true);
-        const stats = await fetchAccountStatistics(accountId);
+        const stats = await fetchAccountStatistics(agencyId, accountId);
         setStatistics(stats);
       } catch (error) {
         console.error('Failed to load account statistics:', error);
@@ -88,7 +101,11 @@ const SnapchatAccountDetails: React.FC = () => {
       if (!accountId) return;
       setLoadingTimeline(true);
       try {
-        const data = await fetchAccountTimelineStatistics(accountId);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const data = await fetchAccountTimelineStatistics(agencyId, accountId);
         setTimelineStats(data);
       } catch (error) {
         console.error('Error loading timeline statistics:', error);
@@ -194,7 +211,11 @@ const SnapchatAccountDetails: React.FC = () => {
         };
       }
 
-      const result = await executeOperation(params);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const result = await executeOperation(agencyId, params);
       console.log('Execution result:', result);
       toast.success('Operation executed successfully.', {
         position: "top-right",

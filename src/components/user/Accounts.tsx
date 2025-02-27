@@ -12,7 +12,7 @@ import {
   GridFooterContainer,
   GridFooter
 } from '@mui/x-data-grid';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -82,6 +82,7 @@ function CustomFooter() {
 
 function Accounts() {
   const navigate = useNavigate();
+  const { agencyId } = useParams<{ agencyId: string }>();
 
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [modalContent, setModalContent] = useState('');
@@ -139,32 +140,29 @@ function Accounts() {
   // Load accounts on mount
   useEffect(() => {
     const loadAccounts = async () => {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       try {
-        // Example fetch with your existing service
-        const data = await fetchAccounts(
-          navigate,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          true
-        );
+        const data = await fetchAccounts(agencyId, () => {});
         setAccounts(data);
       } catch (error) {
         console.error('Failed to load accounts:', error);
       }
     };
     loadAccounts();
-  }, [navigate]);
+  }, [agencyId]);
 
   // Load tags
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const tags = await fetchTags();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const tags = await fetchTags(agencyId);
         setExistingTags(tags);
       } catch (error) {
         console.error('Failed to load tags:', error);
@@ -185,7 +183,11 @@ function Accounts() {
 
   const handleOpenTerminateModal = async () => {
     try {
-      const candidates = await fetchTerminationCandidates();
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const candidates = await fetchTerminationCandidates(agencyId);
       setTerminationCandidates(candidates);
       setIsTerminateModalOpen(true);
     } catch (error: any) {
@@ -196,24 +198,18 @@ function Accounts() {
   };
 
   const terminateAccountHandler = async (accountId: string) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      await terminateAccount(accountId);
+      await terminateAccount(agencyId, accountId);
       toast.success(`Account terminated successfully.`, {
         position: 'top-right',
         autoClose: 3000
       });
       // Optionally refresh the accounts list
-      const data = await fetchAccounts(
-        navigate,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        true
-      );
+      const data = await fetchAccounts(agencyId, () => {});
       setAccounts(data);
     } catch (error) {
       toast.error('Error terminating account. Please try again.', {
@@ -226,8 +222,12 @@ function Accounts() {
 
   const handleTagsUpdate = async (rowId: string, newTags: string[]) => {
     try {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       // 1. Call your updateAccount or similar service
-      await updateAccount(rowId, {
+      await updateAccount(agencyId, rowId, {
         tags: newTags
       });
 
@@ -253,21 +253,14 @@ function Accounts() {
   };
 
   const handleTerminateAccounts = async (selectedAccountIds: string[]) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      await terminateMultipleAccounts(selectedAccountIds);
+      await terminateMultipleAccounts(agencyId, selectedAccountIds);
       setIsTerminateModalOpen(false);
-      // Refresh accounts
-      const data = await fetchAccounts(
-        navigate,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        true
-      );
+      const data = await fetchAccounts(agencyId, () => {});
       setAccounts(data);
       toast.success('Selected accounts have been terminated successfully', {
         position: 'top-right',
@@ -299,9 +292,13 @@ function Accounts() {
       setIsBulkUpdateModalOpen(false);
       return;
     }
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
 
     try {
-      await bulkUpdateAccounts({
+      await bulkUpdateAccounts(agencyId, {
         account_ids: selectionModel.map(id => parseInt(id)), // Convert string IDs to numbers
         status: updates.status,
         tags_to_add: updates.tagsToAdd,
@@ -318,17 +315,7 @@ function Accounts() {
       setSelectionModel([]);
 
       // Reload the accounts to reflect changes
-      const data = await fetchAccounts(
-        navigate,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        true
-      );
+      const data = await fetchAccounts(agencyId, () => {});
       setAccounts(data);
 
       // Update tags in the state
@@ -364,7 +351,7 @@ function Accounts() {
           const row = params.row;
           return (
             <a
-              href={`/snapchat-account/${row.id}`}
+              href={`/agency/${agencyId}/snapchat-account/${row.id}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ textDecoration: 'underline', color: 'blue' }}
@@ -604,7 +591,7 @@ function Accounts() {
           return (
             <div className="d-flex gap-2">
               <button
-                onClick={() => navigate(`/admin/accounts/edit/${row.id}`)}
+                onClick={() => navigate(`/agency/${agencyId}/accounts/edit/${row.id}`)}
                 className="btn btn-sm btn-primary"
                 style={{ padding: '4px 8px', fontSize: '12px' }}
               >
@@ -692,6 +679,7 @@ function Accounts() {
             <AddAccountModal
               isOpen={isAddAccountModalOpen}
               onRequestClose={() => setIsAddAccountModalOpen(false)}
+              agencyId={agencyId || ''}
             />
 
             {/* Terminate Accounts Modal */}
@@ -707,6 +695,7 @@ function Accounts() {
               isOpen={isBulkUpdateModalOpen}
               onClose={() => setIsBulkUpdateModalOpen(false)}
               onConfirm={handleBulkUpdate}
+              agencyId={agencyId || ''}
             />
           </div>
         </div>

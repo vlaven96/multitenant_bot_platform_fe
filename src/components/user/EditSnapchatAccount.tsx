@@ -64,6 +64,7 @@ interface AccountDetails {
 
 const EditSnapchatAccount: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { agencyId } = useParams<{ agencyId: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null);
@@ -77,14 +78,17 @@ const EditSnapchatAccount: React.FC = () => {
   useEffect(() => {
     const loadAccountDetails = async () => {
       try {
-        if (!id) return;
-        const data = await fetchAccountForEdit(id);
+        if (!id || !agencyId) {
+          console.error('ID or Agency ID is undefined');
+          return;
+        }
+        const data = await fetchAccountForEdit(agencyId, id);
         setAccountDetails(data);
         setSelectedModel(data.account.model?.id || null);
         setSelectedChatBot(data.account.chat_bot?.id || null);
         setSelectedStatus(data.account.status || null);
         setSelectedProxy(data.account.proxy?.id || null);
-        setTags(data.account.tags.map(tag => ({ label: tag, value: tag })) || []);
+        setTags(data.account.tags?.map(tag => ({ label: tag, value: tag })) || []);
         setSelectedWorkflow(data.account.workflow?.id || null);
         setLoading(false);
       } catch (error) {
@@ -95,7 +99,7 @@ const EditSnapchatAccount: React.FC = () => {
     };
 
     loadAccountDetails();
-  }, [id]);
+  }, [id, agencyId]);
 
   const handleTagChange = (newValue: any) => {
     setTags(newValue || []);
@@ -105,8 +109,11 @@ const EditSnapchatAccount: React.FC = () => {
     e.preventDefault();
     try {
       if (!id) return;
-      
-      await updateAccount(id, {
+      if (!agencyId) {
+        console.error('ID or Agency ID is undefined');
+        return;
+      }
+      await updateAccount(agencyId, id, {
         model_id: selectedModel,
         chatbot_id: selectedChatBot,
         status: selectedStatus,
@@ -116,7 +123,7 @@ const EditSnapchatAccount: React.FC = () => {
       });
       
       toast.success('Account updated successfully');
-      navigate('/admin/accounts');
+      navigate(`/agency/${agencyId}/accounts`);
     } catch (error) {
       toast.error('Failed to update account');
       console.error('Error updating account:', error);
@@ -274,7 +281,7 @@ const EditSnapchatAccount: React.FC = () => {
           </button>
         </div>
       </form>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from 'react-modal';
 import { addModel, updateModel } from '../../../services/modelsService';
 import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
 
 interface AddModelModalProps {
   isOpen: boolean;
@@ -9,9 +10,10 @@ interface AddModelModalProps {
   onSubmit: (name: string, url: string) => void;
   isEditMode: boolean;
   model?: any;
+  agencyId: string;
 }
 
-const AddModelModal: React.FC<AddModelModalProps> = ({ isOpen, onRequestClose, onSubmit, isEditMode, model }) => {
+const AddModelModal: React.FC<AddModelModalProps> = ({ isOpen, onRequestClose, onSubmit, isEditMode, model, agencyId }) => {
   const [name, setName] = React.useState(model?.name || '');
   const [onlyfans_url, setOnlyfansUrl] = React.useState(model?.onlyfans_url || '');
 
@@ -31,10 +33,14 @@ const AddModelModal: React.FC<AddModelModalProps> = ({ isOpen, onRequestClose, o
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       if (isEditMode) {
-        await updateModel({ id: model.id, name, onlyfans_url });
+        await updateModel(agencyId, { id: model.id, name, onlyfans_url });
       } else {
-        await addModel({ id: 0, name, onlyfans_url });
+        await addModel(agencyId, { name, onlyfans_url });
         onSubmit(name, onlyfans_url);
       }
       setName('');

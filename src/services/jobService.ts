@@ -3,11 +3,9 @@ import { clearAuthData } from "./authService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const fetchJobs = async (
-  statusFilters: string[] = ["ACTIVE", "STOPPED"]
-) => {
+export const fetchJobs = async (agencyId: string, statusFilters: string[] = ["ACTIVE", "STOPPED"]) => {
   try {
-    const response = await axios.get(`${API_URL}/jobs`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/jobs`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -37,7 +35,7 @@ export const fetchJobs = async (
   }
 };
 
-export const createJob = async (jobData: {
+export const createJob = async (agencyId: string, jobData: {
   name: string;
   statuses: string[];
   tags?: string[];
@@ -47,7 +45,7 @@ export const createJob = async (jobData: {
   status?: string;
 }) => {
   try {
-    const response = await axios.post(`${API_URL}/jobs`, jobData, {
+    const response = await axios.post(`${API_URL}/agencies/${agencyId}/jobs`, jobData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -62,9 +60,12 @@ export const createJob = async (jobData: {
   }
 };
 
-export const deleteJob = async (jobId: number) => {
+export const deleteJob = async (agencyId: string, jobId: number) => {
+  if (!agencyId) {
+    throw new Error("Agency ID is undefined");
+  }
   try {
-    const response = await axios.delete(`${API_URL}/jobs/${jobId}`, {
+    const response = await axios.delete(`${API_URL}/agencies/${agencyId}/jobs/${jobId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -79,10 +80,10 @@ export const deleteJob = async (jobId: number) => {
   }
 };
 
-export const updateJobStatus = async (jobId: number, status_update: string) => {
+export const updateJobStatus = async (agencyId: string, jobId: number, status_update: string) => {
   try {
     const response = await axios.patch(
-      `${API_URL}/jobs/${jobId}/status`,
+      `${API_URL}/agencies/${agencyId}/jobs/${jobId}/status`,
       { status_update },
       {
         headers: {
@@ -101,6 +102,7 @@ export const updateJobStatus = async (jobId: number, status_update: string) => {
 };
 
 export const updateJob = async (
+  agencyId: string,
   jobId: number,
   jobData: {
     name: string;
@@ -113,7 +115,7 @@ export const updateJob = async (
   }
 ) => {
   try {
-    const response = await axios.put(`${API_URL}/jobs/${jobId}`, jobData, {
+    const response = await axios.put(`${API_URL}/agencies/${agencyId}/jobs/${jobId}`, jobData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -128,9 +130,9 @@ export const updateJob = async (
   }
 };
 
-export const fetchSimplifiedJobs = async () => {
+export const fetchSimplifiedJobs = async (agencyId: string) => {
   try {
-    const response = await axios.get(`${API_URL}/jobs/simplified`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/jobs/simplified`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -145,9 +147,9 @@ export const fetchSimplifiedJobs = async () => {
   }
 };
 
-export const fetchAssociatedUsernames = async (jobId: number) => {
+export const fetchAssociatedUsernames = async (agencyId: string, jobId: number) => {
   try {
-    const response = await axios.get(`${API_URL}/jobs/${jobId}/accounts`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/jobs/${jobId}/accounts`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

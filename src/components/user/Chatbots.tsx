@@ -5,6 +5,7 @@ import './Chatbots.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AddChatbotModal from './modals/AddChatbotModal';
+import { useParams } from 'react-router-dom';
 
 interface Chatbot {
   id: string;
@@ -12,15 +13,20 @@ interface Chatbot {
   token: string;
 }
 
-function Chatbots() {
+const Chatbots: React.FC = () => {
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newChatbot, setNewChatbot] = useState<Chatbot>({ id: '', type: '', token: '' });
 
   useEffect(() => {
     const loadChatbots = async () => {
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
       try {
-        const data = await fetchChatbots();
+        const data = await fetchChatbots(agencyId);
         setChatbots(data);
       } catch (error) {
         console.error('Failed to load chatbots:', error);
@@ -37,17 +43,21 @@ function Chatbots() {
     };
 
     loadChatbots();
-  }, []);
+  }, [agencyId]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
   const handleAddChatbot = async (type: string, token: string) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      await addChatbot({ id: '', type, token });
-      const updatedChatbots = await fetchChatbots();
-      setChatbots(updatedChatbots);
+      await addChatbot(agencyId, { type, token });
+      const data = await fetchChatbots(agencyId);
+      setChatbots(data);
       toast.success('Chatbot added successfully!', {
         position: 'top-right',
         autoClose: 3000,
@@ -71,12 +81,16 @@ function Chatbots() {
     }
   };
 
-  const handleDeleteChatbot = async (chatbot: Chatbot) => {
-    if (window.confirm(`Are you sure you want to delete the chatbot: ${chatbot.type}?`)) {
+  const handleDeleteChatbot = async (chatbotId: string) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
+    if (window.confirm(`Are you sure you want to delete the chatbot: ${newChatbot.type}?`)) {
       try {
-        await deleteChatbot(chatbot.id);
-        const updatedChatbots = chatbots.filter(c => c.id !== chatbot.id);
-        setChatbots(updatedChatbots);
+        await deleteChatbot(agencyId, chatbotId);
+        const data = await fetchChatbots(agencyId);
+        setChatbots(data);
         toast.success('Chatbot deleted successfully!', {
           position: 'top-right',
           autoClose: 3000,
@@ -102,7 +116,7 @@ function Chatbots() {
   };
 
   const handleEditChatbot = (chatbot: Chatbot) => {
-    setNewChatbot({ id: chatbot.id, type: chatbot.type, token: chatbot.token });
+    setNewChatbot(chatbot);
     setIsModalOpen(true);
   };
 
@@ -113,10 +127,14 @@ function Chatbots() {
   };
 
   const handleUpdateChatbot = async (updatedChatbot: Chatbot) => {
+    if (!agencyId) {
+      console.error('Agency ID is undefined');
+      return;
+    }
     try {
-      await updateChatbot(updatedChatbot);
-      const updatedChatbots = await fetchChatbots();
-      setChatbots(updatedChatbots);
+      await updateChatbot(agencyId, updatedChatbot);
+      const data = await fetchChatbots(agencyId);
+      setChatbots(data);
       toast.success('Chatbot updated successfully!', {
         position: 'top-right',
         autoClose: 3000,
@@ -161,7 +179,7 @@ function Chatbots() {
         Cell: ({ row }: { row: Row<Chatbot> }) => (
           <div>
             <button onClick={() => handleEditChatbot(row.original)} className="btn btn-secondary">Edit</button>
-            <button onClick={() => handleDeleteChatbot(row.original)} className="btn btn-danger">Delete</button>
+            <button onClick={() => handleDeleteChatbot(row.original.id)} className="btn btn-danger">Delete</button>
           </div>
         ),
         width: 150,
@@ -238,10 +256,10 @@ function Chatbots() {
         }}
         isEditMode={isEditMode}
         chatbot={newChatbot}
+        agencyId={agencyId || ''}
       />
-      <ToastContainer />
     </div>
   );
-}
+};
 
 export default Chatbots; 

@@ -8,11 +8,12 @@ import Paper from '@mui/material/Paper';
 import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-
+import { useParams } from 'react-router-dom';
 Chart.register(...registerables);
 
 const Statistics: React.FC = () => {
   const [statistics, setStatistics] = useState<any>(null);
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [statusStatistics, setStatusStatistics] = useState<Record<string, string> | null>(null);
   const [averageTimesBySource, setAverageTimesBySource] = useState<Record<string, string> | null>(null);
   const [executionCountsBySource, setExecutionCountsBySource] = useState<Record<string, number> | null>(null);
@@ -61,13 +62,17 @@ const Statistics: React.FC = () => {
     const loadStatistics = async () => {
       try {
         setLoadingStats(true);
-        const stats = await fetchOverallStatistics();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const stats = await fetchOverallStatistics(agencyId);
         setStatistics(stats);
-        const statusStats = await fetchStatusStatistics();
+        const statusStats = await fetchStatusStatistics(agencyId);
         setStatusStatistics(statusStats);
-        const averageTimes = await fetchAverageTimesBySource();
+        const averageTimes = await fetchAverageTimesBySource(agencyId);
         setAverageTimesBySource(averageTimes);
-        const executionCounts = await fetchExecutionCountsBySource();
+        const executionCounts = await fetchExecutionCountsBySource(agencyId);
         setExecutionCountsBySource(executionCounts);
       } catch (error) {
         console.error('Failed to load statistics:', error);
@@ -80,7 +85,11 @@ const Statistics: React.FC = () => {
     const loadGroupedStatistics = async () => {
       try {
         setLoadingStats(true);
-        const groupedStats = await fetchGroupedByModelStatistics();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const groupedStats = await fetchGroupedByModelStatistics(agencyId);
         console.log('Fetched Grouped Statistics:', groupedStats);
         setGroupedStatistics(groupedStats);
       } catch (error) {
@@ -109,7 +118,11 @@ const Statistics: React.FC = () => {
 
   const fetchAccounts = async () => {
     try {
-      const data = await fetchTopSnapchatAccounts(weightRejectingRate, weightConversationRate, weightConversionRate);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchTopSnapchatAccounts(agencyId, weightRejectingRate, weightConversationRate, weightConversionRate);
       setAccounts(data);
     } catch (error) {
       console.error('Failed to fetch top Snapchat accounts:', error);
@@ -179,7 +192,11 @@ const Statistics: React.FC = () => {
     const selectedDays = parseInt(event.target.value);
     setDays(selectedDays);
     try {
-      const data = await fetchDailyAccountStats(selectedDays);
+      if (!agencyId) {
+        console.error('Agency ID is undefined');
+        return;
+      }
+      const data = await fetchDailyAccountStats(agencyId, selectedDays);
       setDailyStats(data);
     } catch (error) {
       console.error('Failed to fetch daily stats:', error);
@@ -190,7 +207,11 @@ const Statistics: React.FC = () => {
   useEffect(() => {
     const fetchInitialDailyStats = async () => {
       try {
-        const data = await fetchDailyAccountStats(days);
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const data = await fetchDailyAccountStats(agencyId, days);
         setDailyStats(data);
       } catch (error) {
         console.error('Failed to fetch initial daily stats:', error);
@@ -204,7 +225,11 @@ const Statistics: React.FC = () => {
   useEffect(() => {
     const fetchChatbotRuns = async () => {
       try {
-        const runs = await fetchDailyChatbotRuns();
+        if (!agencyId) {
+          console.error('Agency ID is undefined');
+          return;
+        }
+        const runs = await fetchDailyChatbotRuns(agencyId);
         setDailyChatbotRuns(runs);
       } catch (error) {
         console.error('Failed to fetch daily chatbot runs:', error);
