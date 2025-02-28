@@ -1,0 +1,24 @@
+.subscription-card {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+.subscription-card:hover {
+  transform: translateY(-5px);
+}
+
+.subscription-title {
+  margin-bottom: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.subscription-card .MuiTypography-body2 {
+  margin-bottom: 8px;
+  color: #555;
+} 

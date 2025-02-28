@@ -3,6 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Paper,
+} from '@mui/material';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -23,11 +31,9 @@ function Login() {
         draggable: true,
         progress: undefined,
       });
-    
-      // Redirect immediately after showing the toast
+
       const { agency_id } = await login(username, password);
-      toast.success('Login successful!');
-      navigate(`/agency/${agency_id}`); 
+      navigate(`/agency/${agency_id}`);
       window.location.reload();
     } catch (error) {
       toast.error('Login failed. Try again.', {
@@ -44,32 +50,49 @@ function Login() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <Container component="main" maxWidth="xs">
       <ToastContainer />
-      <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow">
-        <div className="mb-3">
-          <input
-            type="text"
+      <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
+        <Typography component="h1" variant="h5" align="center" gutterBottom>
+          Sign In
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-            required
-            className="form-control"
           />
-        </div>
-        <div className="mb-3">
-          <input
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
             type="password"
+            id="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-            className="form-control"
           />
-        </div>
-        <button type="submit" className="btn btn-primary">Login</button>
-      </form>
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Sign In
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
 

@@ -11,6 +11,23 @@ const AdminHome: React.FC = () => {
         Admin Dashboard
       </Typography>
       <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={4} >
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="div">
+                Subscription
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                View and manage your subscription.
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small" component={Link} to={`/agency/${agencyId}/subscription`}>
+                Go to Subscription
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>

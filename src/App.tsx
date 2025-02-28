@@ -24,7 +24,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Statistics from './components/user/Statistics';
 import RegisterAgency from './components/RegisterAgency';
 import RegisterUser from './components/RegisterUser';
-
+import Subscription from './components/admin/Subscription';
 function App() {
   const isAuthenticated = Boolean(localStorage.getItem('access_token'));
   
@@ -37,20 +37,20 @@ function App() {
 
   return (
     <Router>
-      {isAuthenticated && <Header isAdmin={isAdmin} />}
+      {isAuthenticated && <Header isAdmin={isAdmin} isAuthenticated = {isAuthenticated}/>}
       <Routes>
         <Route path="/login" element={<Login />} />
         {/* <Route path="/register" element={<Register />} /> */}
         <Route path="agency/:agencyId/admin" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminHome /></PrivateRoute>} />
         <Route path="agency/:agencyId/admin/users" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Users /></PrivateRoute>} />
-        <Route path="agency/:agencyId/proxies" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Proxies /></PrivateRoute>} />
-        <Route path="agency/:agencyId/accounts" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Accounts /></PrivateRoute>} />
-        <Route path="agency/:agencyId/accounts/edit/:id" element={<EditSnapchatAccount />} />
-        <Route path="agency/:agencyId/models" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Models /></PrivateRoute>} />
-        <Route path="agency/:agencyId/chatbots" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Chatbots /></PrivateRoute>} />
-        <Route path="agency/:agencyId/jobs" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Jobs /></PrivateRoute>} />
-        <Route path="agency/:agencyId/workflows" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Workflows /></PrivateRoute>} />
-        <Route path="agency/:agencyId/statistics" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Statistics /></PrivateRoute>} />
+        <Route path="agency/:agencyId/proxies" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Proxies /></PrivateRoute>} />
+        <Route path="agency/:agencyId/accounts" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Accounts /></PrivateRoute>} />
+        <Route path="agency/:agencyId/accounts/edit/:id" element={<PrivateRoute isAuthenticated={isAuthenticated} ><EditSnapchatAccount /></PrivateRoute>} />
+        <Route path="agency/:agencyId/models" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Models /></PrivateRoute>} />
+        <Route path="agency/:agencyId/chatbots" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Chatbots /></PrivateRoute>} />
+        <Route path="agency/:agencyId/jobs" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Jobs /></PrivateRoute>} />
+        <Route path="agency/:agencyId/workflows" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Workflows /></PrivateRoute>} />
+        <Route path="agency/:agencyId/statistics" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Statistics /></PrivateRoute>} />
         <Route path="agency/:agencyId/user" element={<PrivateRoute isAuthenticated={isAuthenticated}><UserHome /></PrivateRoute>} />
         <Route path="agency/:agencyId/manual-operations" element={<PrivateRoute isAuthenticated={isAuthenticated}><ManualOperations /></PrivateRoute>} />
         <Route path="agency/:agencyId/jobs" element={<PrivateRoute isAuthenticated={isAuthenticated}><Jobs /></PrivateRoute>} />
@@ -58,10 +58,11 @@ function App() {
         <Route path="agency/:agencyId/executions/:id" element={<PrivateRoute isAuthenticated={isAuthenticated}><ExecutionDetails /></PrivateRoute>} />
         <Route path="agency/:agencyId/snapchat-account/:accountId" element={<PrivateRoute isAuthenticated={isAuthenticated}><SnapchatAccountDetails /></PrivateRoute>} />
         <Route path="agency/:agencyId" element={isAuthenticated ? (isAdmin ? <AdminHome /> : <UserHome />) : <Home />} />
+        <Route path="agency/:agencyId/subscription" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Subscription /></PrivateRoute>} />
         <Route path="/" element={isAuthenticated ? <Navigate to={`agency/${agencyId}`} /> : <Home />} />
         <Route path="/register-agency" element={<RegisterAgency />} />
         <Route path="/register" element={<RegisterUser />} />
-        {/* <Route path="*" element={<Navigate to="/" />} /> */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       <ToastContainer />
     </Router>
