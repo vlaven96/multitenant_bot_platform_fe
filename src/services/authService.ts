@@ -12,7 +12,9 @@ export const login = async (username: string, password: string) => {
     const { access_token, token_type, role, agency_id } = response.data;
     localStorage.setItem("access_token", access_token);
     localStorage.setItem("role", role);
-    localStorage.setItem("agency_id", agency_id.toString());
+    if (agency_id) {
+      localStorage.setItem("agency_id", agency_id.toString());
+    }
     return { access_token, token_type, role, agency_id };
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

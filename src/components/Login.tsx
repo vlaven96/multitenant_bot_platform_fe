@@ -33,7 +33,7 @@ function Login() {
       });
 
       const { agency_id } = await login(username, password);
-      navigate(`/agency/${agency_id}`);
+      navigate(`/`);
       window.location.reload();
     } catch (error) {
       toast.error('Login failed. Try again.', {

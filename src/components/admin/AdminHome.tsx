@@ -1,9 +1,9 @@
 import React from 'react';
 import { Container, Typography, Grid, Card, CardContent, CardActions, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
 const AdminHome: React.FC = () => {
-  const agencyId = localStorage.getItem('agency_id');
+  const { agencyId } = useParams<{ agencyId: string }>();
 
   return (
     <Container>

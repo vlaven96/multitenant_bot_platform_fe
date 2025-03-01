@@ -16,3 +16,18 @@ export const registerAgency = async (name: string, agencyEmail: string) => {
     throw error;
   }
 };
+
+// New method to fetch all agencies
+export const fetchAllAgencies = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/agencies`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching agencies:", error);
+    throw error;
+  }
+};

@@ -25,6 +25,8 @@ import Statistics from './components/user/Statistics';
 import RegisterAgency from './components/RegisterAgency';
 import RegisterUser from './components/RegisterUser';
 import Subscription from './components/admin/Subscription';
+import GlobalAdminHome from './components/global_admin/GlobalAdminHome';
+
 function App() {
   const isAuthenticated = Boolean(localStorage.getItem('access_token'));
   
@@ -58,8 +60,13 @@ function App() {
         <Route path="agency/:agencyId/executions/:id" element={<PrivateRoute isAuthenticated={isAuthenticated}><ExecutionDetails /></PrivateRoute>} />
         <Route path="agency/:agencyId/snapchat-account/:accountId" element={<PrivateRoute isAuthenticated={isAuthenticated}><SnapchatAccountDetails /></PrivateRoute>} />
         <Route path="agency/:agencyId" element={isAuthenticated ? (isAdmin ? <AdminHome /> : <UserHome />) : <Home />} />
+        <Route path="agency" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isGlobalAdmin}><GlobalAdminHome /></PrivateRoute>} />
         <Route path="agency/:agencyId/subscription" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Subscription /></PrivateRoute>} />
-        <Route path="/" element={isAuthenticated ? <Navigate to={`agency/${agencyId}`} /> : <Home />} />
+        <Route path="/" element={
+          isAuthenticated ? (
+            isGlobalAdmin ? <Navigate to="/agency" /> : <Navigate to={`agency/${agencyId}`} />
+          ) : <Home />
+        } />
         <Route path="/register-agency" element={<RegisterAgency />} />
         <Route path="/register" element={<RegisterUser />} />
         <Route path="*" element={<Navigate to="/" />} />

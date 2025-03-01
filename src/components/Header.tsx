@@ -13,7 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { logout } from '../services/authService';
 import { styled } from '@mui/material/styles';
-
+import { useParams } from 'react-router-dom';
 interface HeaderProps {
   isAdmin: boolean;
   isAuthenticated: boolean;
@@ -31,7 +31,7 @@ const StyledLink = styled(Link)(({ theme }) => ({
 
 const Header: React.FC<HeaderProps> = ({ isAdmin, isAuthenticated }) => {
   const navigate = useNavigate();
-  const agencyId = localStorage.getItem('agency_id');
+  const { agencyId } = useParams<{ agencyId: string }>();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
