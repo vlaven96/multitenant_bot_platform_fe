@@ -13,7 +13,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { logout } from '../services/authService';
 import { styled } from '@mui/material/styles';
-import { useParams } from 'react-router-dom';
 
 interface HeaderProps {
   isAdmin: boolean;
@@ -21,6 +20,9 @@ interface HeaderProps {
   isGlobalAdmin: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   setRole: React.Dispatch<React.SetStateAction<string | null>>;
+
+  // This is the agency ID we store in App state
+  agencyIdApp: string;
 }
 
 // A styled version of Link that inherits MUI theme colors and styles.
@@ -33,15 +35,15 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-const Header: React.FC<HeaderProps> = ({ 
+const Header: React.FC<HeaderProps> = ({
   isAdmin,
   isAuthenticated,
   isGlobalAdmin,
   setIsAuthenticated,
   setRole,
+  agencyIdApp,
 }) => {
   const navigate = useNavigate();
-  const { agencyId } = useParams<{ agencyId: string }>();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -56,10 +58,15 @@ const Header: React.FC<HeaderProps> = ({
     logout();
     setIsAuthenticated(false);
     setRole(null);
-
-    // Navigate to login
     navigate('/login');
   };
+
+  // If the user is global admin and there's no agency selected, link to /agency
+  // Else link to /agency/<agencyIdApp>
+  const dashboardLink =
+    isGlobalAdmin && !agencyIdApp
+      ? '/agency'
+      : `/agency/${agencyIdApp}`;
 
   return (
     <AppBar
@@ -75,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({
           component="div"
           sx={{ flexGrow: 1, fontWeight: 'bold' }}
         >
-          <StyledLink to={isGlobalAdmin ? '/agency' : `/agency/${agencyId}`}>
+          <StyledLink to={dashboardLink}>
             Dashboard
           </StyledLink>
         </Typography>
@@ -107,85 +114,92 @@ const Header: React.FC<HeaderProps> = ({
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                {isAdmin && (
+                {/* Render links only if we have an agency ID (and user is admin where needed) */}
+                {agencyIdApp && isAdmin && (
                   <MenuItem
                     component={StyledLink}
-                    to={`/agency/${agencyId}/subscription`}
+                    to={`/agency/${agencyIdApp}/subscription`}
                     onClick={handleClose}
                   >
                     Subscription
                   </MenuItem>
                 )}
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/jobs`}
-                  onClick={handleClose}
-                >
-                  Jobs
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/workflows`}
-                  onClick={handleClose}
-                >
-                  Workflows
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/manual-operations`}
-                  onClick={handleClose}
-                >
-                  Manual Operations
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/executions`}
-                  onClick={handleClose}
-                >
-                  Executions
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/admin/users`}
-                  onClick={handleClose}
-                >
-                  Manage Users
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/proxies`}
-                  onClick={handleClose}
-                >
-                  Manage Proxies
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/accounts`}
-                  onClick={handleClose}
-                >
-                  Manage Accounts
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/models`}
-                  onClick={handleClose}
-                >
-                  Manage Models
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/chatbots`}
-                  onClick={handleClose}
-                >
-                  Manage Chatbots
-                </MenuItem>
-                <MenuItem
-                  component={StyledLink}
-                  to={`/agency/${agencyId}/statistics`}
-                  onClick={handleClose}
-                >
-                  Statistics
-                </MenuItem>
+                {agencyIdApp && (
+                  <>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/jobs`}
+                      onClick={handleClose}
+                    >
+                      Jobs
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/workflows`}
+                      onClick={handleClose}
+                    >
+                      Workflows
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/manual-operations`}
+                      onClick={handleClose}
+                    >
+                      Manual Operations
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/executions`}
+                      onClick={handleClose}
+                    >
+                      Executions
+                    </MenuItem>
+                    {isAdmin && (
+                      <MenuItem
+                        component={StyledLink}
+                        to={`/agency/${agencyIdApp}/admin/users`}
+                        onClick={handleClose}
+                      >
+                        Manage Users
+                      </MenuItem>
+                    )}
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/proxies`}
+                      onClick={handleClose}
+                    >
+                      Manage Proxies
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/accounts`}
+                      onClick={handleClose}
+                    >
+                      Manage Accounts
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/models`}
+                      onClick={handleClose}
+                    >
+                      Manage Models
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/chatbots`}
+                      onClick={handleClose}
+                    >
+                      Manage Chatbots
+                    </MenuItem>
+                    <MenuItem
+                      component={StyledLink}
+                      to={`/agency/${agencyIdApp}/statistics`}
+                      onClick={handleClose}
+                    >
+                      Statistics
+                    </MenuItem>
+                  </>
+                )}
               </Menu>
             </>
           )}

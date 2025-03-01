@@ -37,14 +37,14 @@ interface Account {
   creation_date?: string;
   added_to_system_date?: string;
   proxy?: { id: number; host: string };
-  device?: { id: number; data: string };
-  cookies?: { data: string };
-  model?: {
-    id: number;
-    name: string;
-    onlyfans_url: string;
-  };
-  chat_bot?: { id: number; type: string };
+  // device?: { id: number; data: string };
+  // cookies?: { data: string };
+  // model?: {
+  //   id: number;
+  //   name: string;
+  //   onlyfans_url: string;
+  // };
+  // chat_bot?: { id: number; type: string };
   status?: string;
   tags?: string[];
   account_source?: string;
@@ -123,8 +123,8 @@ const ManualOperations: React.FC = () => {
       proxy: true,
       device: true,
       cookies: true,
-      model: true,
-      chat_bot: true,
+      // model: true,
+      // chat_bot: true,
       status: true,
       tags: true,
       account_source: true,
@@ -422,26 +422,26 @@ const ManualOperations: React.FC = () => {
           );
         },
       },
-      {
-        field: 'model',
-        headerName: 'Model',
-        flex: 1,
-        sortable: true,
-        filterable: true,
-        valueGetter: (params: GridValueGetterParams<Account, any>) => {
-          return params?.name || 'Not Available';
-        },
-      },
-      {
-        field: 'chat_bot',
-        headerName: 'ChatBot',
-        flex: 1,
-        sortable: true,
-        filterable: true,
-        valueGetter: (params: GridValueGetterParams<Account, any>) => {
-          return params?.type || 'Not Available';
-        },
-      },
+      // {
+      //   field: 'model',
+      //   headerName: 'Model',
+      //   flex: 1,
+      //   sortable: true,
+      //   filterable: true,
+      //   valueGetter: (params: GridValueGetterParams<Account, any>) => {
+      //     return params?.name || 'Not Available';
+      //   },
+      // },
+      // {
+      //   field: 'chat_bot',
+      //   headerName: 'ChatBot',
+      //   flex: 1,
+      //   sortable: true,
+      //   filterable: true,
+      //   valueGetter: (params: GridValueGetterParams<Account, any>) => {
+      //     return params?.type || 'Not Available';
+      //   },
+      // },
       {
         field: 'snapchat_link',
         headerName: 'Snapchat Link',
@@ -495,38 +495,38 @@ const ManualOperations: React.FC = () => {
           );
         },
       },
-      {
-        field: 'device',
-        headerName: 'Device Model',
-        flex: 1,
-        renderCell: (params: GridRenderCellParams<Account>) => {
-          const device = params.row.device;
-          if (!device) return 'Not Associated';
-          try {
-            const deviceObj = JSON.parse(device.data);
-            return (
-              <span className="clickable-cell" onClick={() => openModal(device.data)}>
-                {deviceObj.device_model || 'Unknown Model'}
-              </span>
-            );
-          } catch {
-            return 'Invalid Device Data';
-          }
-        },
-      },
-      {
-        field: 'cookies',
-        headerName: 'Cookies',
-        flex: 1,
-        renderCell: (params: GridRenderCellParams<Account>) => {
-          const cookies = params.row.cookies;
-          return (
-            <span className="clickable-cell" onClick={() => openModal(cookies ? cookies.data : 'Not Associated')}>
-              {cookies ? 'View Cookies' : 'Not Associated'}
-            </span>
-          );
-        },
-      },
+      // {
+      //   field: 'device',
+      //   headerName: 'Device Model',
+      //   flex: 1,
+      //   renderCell: (params: GridRenderCellParams<Account>) => {
+      //     const device = params.row.device;
+      //     if (!device) return 'Not Associated';
+      //     try {
+      //       const deviceObj = JSON.parse(device.data);
+      //       return (
+      //         <span className="clickable-cell" onClick={() => openModal(device.data)}>
+      //           {deviceObj.device_model || 'Unknown Model'}
+      //         </span>
+      //       );
+      //     } catch {
+      //       return 'Invalid Device Data';
+      //     }
+      //   },
+      // },
+      // {
+      //   field: 'cookies',
+      //   headerName: 'Cookies',
+      //   flex: 1,
+      //   renderCell: (params: GridRenderCellParams<Account>) => {
+      //     const cookies = params.row.cookies;
+      //     return (
+      //       <span className="clickable-cell" onClick={() => openModal(cookies ? cookies.data : 'Not Associated')}>
+      //         {cookies ? 'View Cookies' : 'Not Associated'}
+      //       </span>
+      //     );
+      //   },
+      // },
       {
         field: 'tags',
         headerName: 'Tags',
@@ -611,8 +611,7 @@ const ManualOperations: React.FC = () => {
   );
 
   const isSubmitDisabled = () => {
-    console.log("Aiiiiii")
-    console.log(selectionModel)
+
     // If generate_leads
     if (operationType === 'generate_leads') {
       const totalWeight =
@@ -637,6 +636,22 @@ const ManualOperations: React.FC = () => {
       }
       return false;
     }
+    if(selectionModel.length === 0) {
+      return true;
+    }
+    if (operationType === 'quick_adds') {
+      if (requests === null || requests === undefined || requests === '') {
+        return true;
+      }
+      return false;
+    }
+    if (operationType === 'send_to_user') {
+      if (username === null || username === undefined || username === '') {
+        return true;
+      }
+      return false;
+    }
+    
     // If not generate_leads and no selected rows
     if (operationType && operationType !== 'generate_leads' && selectionModel.length === 0) {
       return true;
@@ -666,9 +681,9 @@ const ManualOperations: React.FC = () => {
           <option value="check_conversations">Check Conversations</option>
           <option value="status_check">Check Status</option>
           <option value="compute_statistics">Compute Statistics</option>
-          <option value="generate_leads">Generate Leads</option>
+          {/* <option value="generate_leads">Generate Leads</option>
           <option value="consume_leads">Consume Leads</option>
-          <option value="quick_adds_top_accounts">Quick Adds Top Accounts</option>  
+          <option value="quick_adds_top_accounts">Quick Adds Top Accounts</option>   */}
           <option value="set_bitmoji">Set Bitmoji</option>
           <option value="change_bitmoji">Change Bitmoji</option>
         </select>
@@ -677,7 +692,7 @@ const ManualOperations: React.FC = () => {
         {operationType === 'quick_adds' && (
           <div className="configuration-container">
             {/* startingDelay, requests, batches, batchDelay, quickAddPages, usersSentInRequest, argoTokens */}
-            <div>
+            {/* <div>
               <label>Max Starting Delay (seconds):</label>
               <input
                 type="number"
@@ -685,9 +700,9 @@ const ManualOperations: React.FC = () => {
                 onChange={(e) => setStartingDelay(e.target.value)}
                 className="form-control"
               />
-            </div>
+            </div> */}
             <div>
-              <label>Requests (# of accounts to receive add request):</label>
+              <label>Number of Quick Adds to Send from Each Account:</label>
               <input
                 type="number"
                 value={requests}
@@ -695,7 +710,7 @@ const ManualOperations: React.FC = () => {
                 className="form-control"
               />
             </div>
-            <div>
+            {/* <div>
               <label>Batches:</label>
               <input
                 type="number"
@@ -703,8 +718,8 @@ const ManualOperations: React.FC = () => {
                 onChange={(e) => setBatches(e.target.value)}
                 className="form-control"
               />
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <label>Batch Delay (seconds):</label>
               <input
                 type="number"
@@ -712,8 +727,8 @@ const ManualOperations: React.FC = () => {
                 onChange={(e) => setBatchDelay(e.target.value)}
                 className="form-control"
               />
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <label>Max Quick Add Pages:</label>
               <input
                 type="number"
@@ -721,8 +736,8 @@ const ManualOperations: React.FC = () => {
                 onChange={(e) => setQuickAddPages(e.target.value)}
                 className="form-control"
               />
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <label>Users Sent in Request:</label>
               <input
                 type="number"
@@ -730,21 +745,21 @@ const ManualOperations: React.FC = () => {
                 onChange={(e) => setUsersSentInRequest(e.target.value)}
                 className="form-control"
               />
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <label>Use Argo Tokens:</label>
               <input
                 type="checkbox"
                 checked={argoTokens}
                 onChange={(e) => setArgoTokens(e.target.checked)}
               />
-            </div>
+            </div> */}
           </div>
         )}
         {operationType === 'send_to_user' && (
           <div className="configuration-container">
             <div>
-              <label>Username:</label>
+              <label>Username to Receive Quick Add Requests:</label>
               <input
                 type="text"
                 value={username}
@@ -752,7 +767,7 @@ const ManualOperations: React.FC = () => {
                 className="form-control"
               />
             </div>
-            <div>
+            {/* <div>
               <label>Max Starting Delay (seconds):</label>
               <input
                 type="number"
@@ -760,10 +775,10 @@ const ManualOperations: React.FC = () => {
                 onChange={(e) => setStartingDelay(e.target.value)}
                 className="form-control"
               />
-            </div>
+            </div> */}
           </div>
         )}
-        {(operationType === 'check_conversations' || operationType === 'status_check' || operationType === 'set_bitmoji' || operationType === 'change_bitmoji') && (
+        {/* {(operationType === 'check_conversations' || operationType === 'status_check' || operationType === 'set_bitmoji' || operationType === 'change_bitmoji') && (
           <div>
             <label>Max Starting Delay (seconds):</label>
             <input
@@ -773,7 +788,7 @@ const ManualOperations: React.FC = () => {
               className="form-control"
             />
           </div>
-        )}
+        )} */}
         {operationType === 'compute_statistics' && (
           <p>Compute statistics will run on all selected accounts.</p>
         )}

@@ -343,7 +343,7 @@ const SnapchatAccountDetails: React.FC = () => {
         >
           <option value="">Select Operation</option>
           <option value="quick_adds">QuickAdds</option>
-          <option value="consume_leads">Consume Leads</option>
+          {/* <option value="consume_leads">Consume Leads</option> */}
           <option value="send_to_user">Send to User</option>
           <option value="check_conversations">Check Conversations</option>
           <option value="compute_statistics">Compute Statistics</option>
@@ -351,7 +351,7 @@ const SnapchatAccountDetails: React.FC = () => {
         {operationType === 'quick_adds' && (
           <div className="quick-adds-container">
             <div className="mb-2 flex-item">
-              <label>How many accounts should receive add request:</label>
+              <label>Number of Quick Adds to Send:</label>
               <input
                 type="number"
                 value={requests}
@@ -361,7 +361,7 @@ const SnapchatAccountDetails: React.FC = () => {
                 min="1"
               />
             </div>
-            <div className="mb-2 flex-item">
+            {/* <div className="mb-2 flex-item">
               <label>Number of Batches:</label>
               <input
                 type="number"
@@ -371,8 +371,8 @@ const SnapchatAccountDetails: React.FC = () => {
                 className="form-control"
                 min="1"
               />
-            </div>
-            <div className="mb-2 flex-item">
+            </div> */}
+            {/* <div className="mb-2 flex-item">
               <label>Batch Delay (seconds):</label>
               <input
                 type="number"
@@ -382,8 +382,8 @@ const SnapchatAccountDetails: React.FC = () => {
                 className="form-control"
                 min="0"
               />
-            </div>
-            <div className="mb-2 flex-item">
+            </div> */}
+            {/* <div className="mb-2 flex-item">
               <label>Max Quick Add Pages:</label>
               <input
                 type="number"
@@ -393,8 +393,8 @@ const SnapchatAccountDetails: React.FC = () => {
                 className="form-control"
                 min="0"
               />
-            </div>
-            <div className="mb-2 flex-item">
+            </div> */}
+            {/* <div className="mb-2 flex-item">
               <label>Users Sent in Request:</label>
               <input
                 type="number"
@@ -404,8 +404,8 @@ const SnapchatAccountDetails: React.FC = () => {
                 className="form-control"
                 min="0"
               />
-            </div>
-            <div className="mb-2 flex-item">
+            </div> */}
+            {/* <div className="mb-2 flex-item">
               <label>Use Argo Tokens:</label>
               <input
                 type="checkbox"
@@ -413,7 +413,7 @@ const SnapchatAccountDetails: React.FC = () => {
                 onChange={(e) => setArgoTokens(e.target.checked)}
                 className="form-check-input"
               />
-            </div>
+            </div> */}
           </div>
         )}
         {operationType === 'consume_leads' && (

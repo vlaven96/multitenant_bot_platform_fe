@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import React, { useState } from 'react';
+
+// --- Your existing imports ---
 import Login from './components/Login';
 import Register from './components/Register';
 import AdminHome from './components/admin/AdminHome';
@@ -28,7 +30,11 @@ import RegisterUser from './components/RegisterUser';
 import Subscription from './components/admin/Subscription';
 import GlobalAdminHome from './components/global_admin/GlobalAdminHome';
 
+// --- NEW: import the wrapper component that captures :agencyId and updates state ---
+import AgencyIdCapture from './components/AgencyIdCapture';
+
 function App() {
+  // Track auth in React state
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
     Boolean(localStorage.getItem('access_token'))
   );
@@ -39,43 +45,259 @@ function App() {
   const isAgencyAdmin = role === 'ADMIN';
   const isAdmin = isGlobalAdmin || isAgencyAdmin;
 
-  // Read agency ID (if any) from localStorage
+  // The "currently selected" agency in App-level state
+  const [agencyIdApp, setAgencyIdApp] = useState(
+    localStorage.getItem('agency_id') || ''
+  );
+
+  // This logic is used in the root route to decide where to redirect if the user is authenticated
   const agencyId = localStorage.getItem('agency_id') || '';
 
   return (
     <Router>
-      {<Header isAdmin={isAdmin} isAuthenticated = {isAuthenticated} isGlobalAdmin={isGlobalAdmin} setIsAuthenticated={setIsAuthenticated} setRole={setRole}/>}
+      {/*
+        Always render <Header> outside <Routes>.
+        Pass the current agencyIdApp and the setIsAuthenticated/setRole to handle logout, etc.
+      */}
+      <Header
+        isAdmin={isAdmin}
+        isAuthenticated={isAuthenticated}
+        isGlobalAdmin={isGlobalAdmin}
+        setIsAuthenticated={setIsAuthenticated}
+        setRole={setRole}
+        agencyIdApp={agencyIdApp}
+      />
+
       <Routes>
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
+        {/* If you still need the old register route: */}
         {/* <Route path="/register" element={<Register />} /> */}
-        <Route path="agency/:agencyId/admin" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><AdminHome /></PrivateRoute>} />
-        <Route path="agency/:agencyId/admin/users" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Users /></PrivateRoute>} />
-        <Route path="agency/:agencyId/proxies" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Proxies /></PrivateRoute>} />
-        <Route path="agency/:agencyId/accounts" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Accounts /></PrivateRoute>} />
-        <Route path="agency/:agencyId/accounts/edit/:id" element={<PrivateRoute isAuthenticated={isAuthenticated} ><EditSnapchatAccount /></PrivateRoute>} />
-        <Route path="agency/:agencyId/models" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Models /></PrivateRoute>} />
-        <Route path="agency/:agencyId/chatbots" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Chatbots /></PrivateRoute>} />
-        <Route path="agency/:agencyId/jobs" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Jobs /></PrivateRoute>} />
-        <Route path="agency/:agencyId/workflows" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Workflows /></PrivateRoute>} />
-        <Route path="agency/:agencyId/statistics" element={<PrivateRoute isAuthenticated={isAuthenticated} ><Statistics /></PrivateRoute>} />
-        <Route path="agency/:agencyId/user" element={<PrivateRoute isAuthenticated={isAuthenticated}><UserHome /></PrivateRoute>} />
-        <Route path="agency/:agencyId/manual-operations" element={<PrivateRoute isAuthenticated={isAuthenticated}><ManualOperations /></PrivateRoute>} />
-        <Route path="agency/:agencyId/jobs" element={<PrivateRoute isAuthenticated={isAuthenticated}><Jobs /></PrivateRoute>} />
-        <Route path="agency/:agencyId/executions" element={<PrivateRoute isAuthenticated={isAuthenticated}><Executions /></PrivateRoute>} />
-        <Route path="agency/:agencyId/executions/:id" element={<PrivateRoute isAuthenticated={isAuthenticated}><ExecutionDetails /></PrivateRoute>} />
-        <Route path="agency/:agencyId/snapchat-account/:accountId" element={<PrivateRoute isAuthenticated={isAuthenticated}><SnapchatAccountDetails /></PrivateRoute>} />
-        <Route path="agency/:agencyId" element={isAuthenticated ? (isAdmin ? <AdminHome /> : <UserHome />) : <Home />} />
-        <Route path="agency" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isGlobalAdmin}><GlobalAdminHome /></PrivateRoute>} />
-        <Route path="agency/:agencyId/subscription" element={<PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}><Subscription /></PrivateRoute>} />
-        <Route path="/" element={
-          isAuthenticated ? (
-            isGlobalAdmin ? <Navigate to="/agency" /> : <Navigate to={`agency/${agencyId}`} />
-          ) : <Home />
-        } />
         <Route path="/register-agency" element={<RegisterAgency />} />
         <Route path="/register" element={<RegisterUser />} />
+
+        {/* 
+          For each route that includes /agency/:agencyId,
+          wrap the element with <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>, 
+          which updates the app-level agencyIdApp whenever the user navigates here.
+        */}
+
+        <Route
+          path="agency/:agencyId/admin"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <AdminHome />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/admin/users"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Users />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/proxies"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Proxies />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/accounts"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Accounts />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/accounts/edit/:id"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <EditSnapchatAccount />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/models"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Models />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/chatbots"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Chatbots />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/jobs"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Jobs />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/workflows"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Workflows />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/statistics"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Statistics />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/user"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <UserHome />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/manual-operations"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <ManualOperations />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/jobs"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Jobs />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/executions"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Executions />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/executions/:id"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <ExecutionDetails />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/snapchat-account/:accountId"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <SnapchatAccountDetails />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="agency/:agencyId/subscription"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                <Subscription />
+              </AgencyIdCapture>
+            </PrivateRoute>
+          }
+        />
+
+        {/* This route: if isAuthenticated, show AdminHome or UserHome based on role;
+           otherwise show Home. We also wrap it with AgencyIdCapture. */}
+        <Route
+          path="agency/:agencyId"
+          element={
+            isAuthenticated ? (
+              <AgencyIdCapture setAgencyIdApp={setAgencyIdApp}>
+                {isAdmin ? <AdminHome /> : <UserHome />}
+              </AgencyIdCapture>
+            ) : (
+              <Home />
+            )
+          }
+        />
+
+        {/* Global admin route with no :agencyId */}
+        <Route
+          path="agency"
+          element={
+            <PrivateRoute isAuthenticated={isAuthenticated} isAdmin={isGlobalAdmin}>
+              <GlobalAdminHome />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Root route */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              isGlobalAdmin ? (
+                <Navigate to="/agency" />
+              ) : (
+                <Navigate to={`agency/${agencyId}`} />
+              )
+            ) : (
+              <Home />
+            )
+          }
+        />
+
+        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+
       <ToastContainer />
     </Router>
   );

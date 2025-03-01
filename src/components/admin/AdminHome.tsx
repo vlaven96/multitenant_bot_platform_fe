@@ -113,7 +113,7 @@ const AdminHome: React.FC = () => {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        {/* <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>
               <Typography variant="h5" component="div">
@@ -129,8 +129,8 @@ const AdminHome: React.FC = () => {
               </Button>
             </CardActions>
           </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        </Grid> */}
+        {/* <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>
               <Typography variant="h5" component="div">
@@ -146,7 +146,7 @@ const AdminHome: React.FC = () => {
               </Button>
             </CardActions>
           </Card>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>

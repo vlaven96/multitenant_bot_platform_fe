@@ -45,11 +45,11 @@ interface Account {
   creation_date?: string;
   added_to_system_date?: string;
   proxy?: { id: number; host: string };
-  device?: { data: string };
-  cookies?: { data: string };
+  // device?: { data: string };
+  // cookies?: { data: string };
   account_executions?: { status: string }[];
-  model?: { id: number; name: string };
-  chat_bot?: { id: number; type: string };
+  // model?: { id: number; name: string };
+  // chat_bot?: { id: number; type: string };
   status?: string;
   tags?: string[];
   account_source?: string;
@@ -361,26 +361,26 @@ function Accounts() {
           );
         },
       },
-      {
-        field: 'model',
-        headerName: 'Model',
-        flex: 1,
-        sortable: true,
-        filterable: true,
-        valueGetter: (params: GridValueGetterParams<Account, any>) => {
-          return params?.name || 'Not Available';
-        },
-      },
-      {
-        field: 'chat_bot',
-        headerName: 'ChatBot',
-        flex: 1,
-        sortable: true,
-        filterable: true,
-        valueGetter: (params: GridValueGetterParams<Account, any>) => {
-          return params?.type || 'Not Available';
-        },
-      },
+      // {
+      //   field: 'model',
+      //   headerName: 'Model',
+      //   flex: 1,
+      //   sortable: true,
+      //   filterable: true,
+      //   valueGetter: (params: GridValueGetterParams<Account, any>) => {
+      //     return params?.name || 'Not Available';
+      //   },
+      // },
+      // {
+      //   field: 'chat_bot',
+      //   headerName: 'ChatBot',
+      //   flex: 1,
+      //   sortable: true,
+      //   filterable: true,
+      //   valueGetter: (params: GridValueGetterParams<Account, any>) => {
+      //     return params?.type || 'Not Available';
+      //   },
+      // },
       {
         field: 'password',
         headerName: 'Password',
@@ -443,41 +443,41 @@ function Accounts() {
           );
         },
       },
-      {
-        field: 'device',
-        headerName: 'Device Model',
-        flex: 1,
-        renderCell: (params: GridRenderCellParams<Account>) => {
-          const device = params.row.device;
-          if (!device) return 'Not Associated';
-          try {
-            const deviceObj = JSON.parse(device.data);
-            return (
-              <span className="clickable-cell" onClick={() => openModal(device.data)}>
-                {deviceObj.device_model || 'Unknown Model'}
-              </span>
-            );
-          } catch {
-            return 'Invalid Device Data';
-          }
-        },
-      },
-      {
-        field: 'cookies',
-        headerName: 'Cookies',
-        flex: 1,
-        renderCell: (params: GridRenderCellParams<Account>) => {
-          const cookies = params.row.cookies;
-          return (
-            <span
-              className="clickable-cell"
-              onClick={() => openModal(cookies ? cookies.data : 'Not Associated')}
-            >
-              {cookies ? 'View Cookies' : 'Not Associated'}
-            </span>
-          );
-        },
-      },
+      // {
+      //   field: 'device',
+      //   headerName: 'Device Model',
+      //   flex: 1,
+      //   renderCell: (params: GridRenderCellParams<Account>) => {
+      //     const device = params.row.device;
+      //     if (!device) return 'Not Associated';
+      //     try {
+      //       const deviceObj = JSON.parse(device.data);
+      //       return (
+      //         <span className="clickable-cell" onClick={() => openModal(device.data)}>
+      //           {deviceObj.device_model || 'Unknown Model'}
+      //         </span>
+      //       );
+      //     } catch {
+      //       return 'Invalid Device Data';
+      //     }
+      //   },
+      // },
+      // {
+      //   field: 'cookies',
+      //   headerName: 'Cookies',
+      //   flex: 1,
+      //   renderCell: (params: GridRenderCellParams<Account>) => {
+      //     const cookies = params.row.cookies;
+      //     return (
+      //       <span
+      //         className="clickable-cell"
+      //         onClick={() => openModal(cookies ? cookies.data : 'Not Associated')}
+      //       >
+      //         {cookies ? 'View Cookies' : 'Not Associated'}
+      //       </span>
+      //     );
+      //   },
+      // },
       {
         field: 'status',
         headerName: 'Status',
