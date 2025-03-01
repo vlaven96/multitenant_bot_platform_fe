@@ -271,7 +271,7 @@ const SnapchatAccountDetails: React.FC = () => {
         <div className="account-info">
           <div className="header-with-button">
             <h2>Account Details</h2>
-            <a
+            {/* <a
               href={`https://dpabotplatform.grafana.net/d/be82z10zjehoge/dpa-platform-by-account?orgId=1&from=now-6h&to=now&timezone=browser&var-user_account=${account.username}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -283,7 +283,7 @@ const SnapchatAccountDetails: React.FC = () => {
                 alt="Grafana"       
                 className="grafana-logo"
               />
-            </a>
+            </a> */}
           </div>
 
           <div className="account-details-lists">
@@ -321,10 +321,10 @@ const SnapchatAccountDetails: React.FC = () => {
 
             <div>
               <ListGroup>
-                <ListGroupItem>Device Model: {account.device ? <span onClick={() => handleJsonClick(account.device)}>View Details</span> : 'Not Available'}</ListGroupItem>
+                {/* <ListGroupItem>Device Model: {account.device ? <span onClick={() => handleJsonClick(account.device)}>View Details</span> : 'Not Available'}</ListGroupItem>
                 <ListGroupItem>Cookies: {account.cookies ? <span onClick={() => handleJsonClick(account.cookies)}>View Details</span> : 'Not Available'}</ListGroupItem>
                 <ListGroupItem>Model: {account.model?.name}</ListGroupItem>
-                <ListGroupItem>ChatBot: {account.chat_bot?.type}</ListGroupItem>
+                <ListGroupItem>ChatBot: {account.chat_bot?.type}</ListGroupItem> */}
                 <ListGroupItem>Status: <span className={getStatusClass(account.status)}>{account.status || 'Unknown'}</span></ListGroupItem>
                 <ListGroupItem>Tags: {account.tags?.join(', ')}</ListGroupItem>
                 <ListGroupItem>Source: {account.account_source}</ListGroupItem>
@@ -567,7 +567,7 @@ const SnapchatAccountDetails: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="col-md-4">
+            {/* <div className="col-md-4">
               <div className="card h-100">
                 <div className="card-body">
                   <h5 className="card-title">Chatbot Statistics</h5>
@@ -619,8 +619,8 @@ const SnapchatAccountDetails: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col-md-4">
+            </div> */}
+            {/* <div className="col-md-4">
               <div className="card h-100">
                 <div className="card-body">
                   <h5 className="card-title">Conversions</h5>
@@ -680,7 +680,7 @@ const SnapchatAccountDetails: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div className="alert alert-info">No statistics available.</div>

@@ -259,7 +259,7 @@ const Statistics: React.FC = () => {
       {loadingStats ? (
         <div>Loading...</div>
       ) : selectedModel === 'overall' ? (
-        <Grid container spacing={4}>
+        <Grid container spacing={4} justifyContent="center" alignItems="center">
           <Grid item xs={12} md={4}>
             <Card variant="outlined">
               <CardContent>
@@ -314,7 +314,7 @@ const Statistics: React.FC = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h5" color="success.main" gutterBottom><BarChart /> Chatbot Statistics</Typography>
@@ -370,8 +370,8 @@ const Statistics: React.FC = () => {
                 </List>
               </CardContent>
             </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
+          </Grid> */}
+          {/* <Grid item xs={12} md={4}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h5" color="warning.main" gutterBottom><BarChart /> Conversions</Typography>
@@ -424,7 +424,7 @@ const Statistics: React.FC = () => {
                 </List>
               </CardContent>
             </Card>
-          </Grid>
+          </Grid> */}
         </Grid>
       ) : (
         <Grid container spacing={4}>
@@ -641,7 +641,7 @@ const Statistics: React.FC = () => {
           </List>
         </div>
       )}
-      {dailyChatbotRuns !== null && (
+      {/* {dailyChatbotRuns !== null && (
         <Card variant="outlined" sx={{ marginBottom: '20px' }}>
           <CardContent>
             <Typography variant="h4" align="center" gutterBottom>
@@ -649,7 +649,7 @@ const Statistics: React.FC = () => {
             </Typography>
           </CardContent>
         </Card>
-      )}
+      )} */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
         <Typography variant="h4" align="center" gutterBottom style={{ marginRight: '20px' }}>
           Daily Account Statistics
@@ -697,9 +697,9 @@ const Statistics: React.FC = () => {
         }}
       />
 
-      <Typography variant="h4" align="center" gutterBottom>Top Snapchat Accounts</Typography>
+      {/* <Typography variant="h4" align="center" gutterBottom>Top Snapchat Accounts</Typography> */}
 
-      <div style={{ textAlign: 'center', margin: '40px 0' }}>
+      {/* <div style={{ textAlign: 'center', margin: '40px 0' }}>
         <Typography variant="h6">Adjust Weights</Typography>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
           <TextField
@@ -734,10 +734,10 @@ const Statistics: React.FC = () => {
         <Button variant="contained" color="primary" onClick={handleApplyWeights} disabled={weightError !== ''}>
           Apply Weights
         </Button>
-      </div>
+      </div> */}
     
       
-      <Paper sx={{ height: 600, width: '100%', marginTop: '20px' }}>
+      {/* <Paper sx={{ height: 600, width: '100%', marginTop: '20px' }}>
         <DataGrid
           rows={accounts.map((account, index) => ({ id: index, ...account }))}
           columns={columns}
@@ -746,7 +746,7 @@ const Statistics: React.FC = () => {
           hideFooterSelectedRowCount
           sx={{ border: 0 }}
         />
-      </Paper>
+      </Paper> */}
     </Container>
   );
 

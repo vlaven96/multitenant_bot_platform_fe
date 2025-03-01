@@ -244,7 +244,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClos
         ></button>
       </div>
       <div className="modal-body">
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="form-label">Model</label>
           <Select
             value={selectedModel}
@@ -259,8 +259,8 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClos
               menuPortal: (base) => ({ ...base, zIndex: 9999 })
             }}
           />
-        </div>
-        <div className="mb-3">
+        </div> */}
+        {/* <div className="mb-3">
           <label className="form-label">Chatbot</label>
           <Select
             value={selectedChatbot}
@@ -275,7 +275,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ isOpen, onRequestClos
               menuPortal: (base) => ({ ...base, zIndex: 9999 })
             }}
           />
-        </div>
+        </div> */}
         <div className="mb-3">
           <label className="form-label">Source</label>
           <CreatableSelect
