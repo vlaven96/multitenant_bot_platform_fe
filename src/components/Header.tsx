@@ -14,9 +14,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { logout } from '../services/authService';
 import { styled } from '@mui/material/styles';
 import { useParams } from 'react-router-dom';
+
 interface HeaderProps {
   isAdmin: boolean;
   isAuthenticated: boolean;
+  isGlobalAdmin: boolean;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
+  setRole: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 // A styled version of Link that inherits MUI theme colors and styles.
@@ -29,7 +33,13 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-const Header: React.FC<HeaderProps> = ({ isAdmin, isAuthenticated }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  isAdmin,
+  isAuthenticated,
+  isGlobalAdmin,
+  setIsAuthenticated,
+  setRole,
+}) => {
   const navigate = useNavigate();
   const { agencyId } = useParams<{ agencyId: string }>();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -44,6 +54,10 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, isAuthenticated }) => {
 
   const handleLogout = () => {
     logout();
+    setIsAuthenticated(false);
+    setRole(null);
+
+    // Navigate to login
     navigate('/login');
   };
 
@@ -61,7 +75,9 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, isAuthenticated }) => {
           component="div"
           sx={{ flexGrow: 1, fontWeight: 'bold' }}
         >
-          <StyledLink to={`/agency/${agencyId}`}>Dashboard</StyledLink>
+          <StyledLink to={isGlobalAdmin ? '/agency' : `/agency/${agencyId}`}>
+            Dashboard
+          </StyledLink>
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {isAuthenticated && (

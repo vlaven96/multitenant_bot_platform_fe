@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import Login from './components/Login';
 import Register from './components/Register';
 import AdminHome from './components/admin/AdminHome';
@@ -28,18 +29,22 @@ import Subscription from './components/admin/Subscription';
 import GlobalAdminHome from './components/global_admin/GlobalAdminHome';
 
 function App() {
-  const isAuthenticated = Boolean(localStorage.getItem('access_token'));
-  
-  const role = localStorage.getItem('role');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    Boolean(localStorage.getItem('access_token'))
+  );
+  const [role, setRole] = useState<string | null>(localStorage.getItem('role'));
+
+  // Compute derived role flags
   const isGlobalAdmin = role === 'GLOBAL_ADMIN';
   const isAgencyAdmin = role === 'ADMIN';
   const isAdmin = isGlobalAdmin || isAgencyAdmin;
 
-  const agencyId = localStorage.getItem('agency_id');
+  // Read agency ID (if any) from localStorage
+  const agencyId = localStorage.getItem('agency_id') || '';
 
   return (
     <Router>
-      {isAuthenticated && <Header isAdmin={isAdmin} isAuthenticated = {isAuthenticated}/>}
+      {<Header isAdmin={isAdmin} isAuthenticated = {isAuthenticated} isGlobalAdmin={isGlobalAdmin} setIsAuthenticated={setIsAuthenticated} setRole={setRole}/>}
       <Routes>
         <Route path="/login" element={<Login />} />
         {/* <Route path="/register" element={<Register />} /> */}
