@@ -375,10 +375,27 @@ const ManualOperations: React.FC = () => {
       }
       const result = await executeOperation(agencyId, params);
       console.log('Execution result:', result);
-      toast.success('Operation executed successfully.', {
-        position: 'top-right',
-        autoClose: 3000,
-      });
+      if (result.errorDetail) {
+        toast.error(`Payment Required: ${result.errorDetail}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else {
+        toast.success('Operation executed successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
 
       // Reset fields
       setOperationType('');
@@ -390,11 +407,16 @@ const ManualOperations: React.FC = () => {
       setUsername('');
       setSelectionModel([]);
     } catch (error) {
-      toast.error('Failed to execute operation. Please try again.', {
-        position: 'top-right',
-        autoClose: 3000,
+      console.error('Error executing operation:', error);
+      toast.error('An error occurred. Please try again.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
-      console.error(error);
     }
   };
 

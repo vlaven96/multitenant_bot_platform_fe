@@ -135,11 +135,11 @@ const Executions: React.FC = () => {
               <br />
               <strong>End Time:</strong> {execution.end_time ? new Date(execution.end_time).toLocaleString() : 'N/A'}
               <br />
-              <strong>Configuration:</strong>
+              {/* <strong>Configuration:</strong>
               <pre className="mb-0">
                 {JSON.stringify(execution.configuration, null, 2)}
               </pre>
-              <br />
+              <br /> */}
               <strong>Results:</strong>
               <div className="results-container">
                 {Object.entries(results[index] || {}).map(([key, value]: [string, any]) => (

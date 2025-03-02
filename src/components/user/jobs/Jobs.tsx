@@ -70,13 +70,13 @@ const Jobs: React.FC = () => {
 
   const typeOptions = [
     { value: 'quick_adds', label: 'Quick Adds' },
-    { value: 'consume_leads', label: 'Consume Leads' },
+    // { value: 'consume_leads', label: 'Consume Leads' },
     { value: 'send_to_user', label: 'Send to User' },
     { value: 'check_conversations', label: 'Check Conversations' },
     { value: 'status_check', label: 'Check Status' },
     { value: 'compute_statistics', label: 'Compute Statistics' },
-    { value: 'generate_leads', label: 'Generate Leads' },
-    { value: 'quick_adds_top_accounts', label: 'Quick Adds Top Accounts' }
+    // { value: 'generate_leads', label: 'Generate Leads' },
+    // { value: 'quick_adds_top_accounts', label: 'Quick Adds Top Accounts' }
   ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -446,27 +446,27 @@ const Jobs: React.FC = () => {
       case 'quick_adds':
         return (
           <div>
-            <div className="form-group mb-2">
+            {/* <div className="form-group mb-2">
               <label>Starting Delay (seconds)</label>
               <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div>
+            </div> */}
             <div className="form-group mb-2">
-              <label>Requests</label>
+              <label>Number of Quick Adds to Send</label>
               <input type="number" value={requests} onChange={(e) => setRequests(e.target.value)} className="form-control" />
             </div>
-            <div className="form-group mb-2">
+            {/* <div className="form-group mb-2">
               <label>Batches</label>
               <input type="number" value={batches} onChange={(e) => setBatches(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
+            </div> */}
+            {/* <div className="form-group mb-2">
               <label>Batch Delay (seconds)</label>
               <input type="number" value={batchDelay} onChange={(e) => setBatchDelay(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
+            </div> */}
+            {/* <div className="form-group mb-2">
               <label>Quick Add Pages</label>
               <input type="number" value={quickAddPages} onChange={(e) => setQuickAddPages(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
+            </div> */}
+            {/* <div className="form-group mb-2">
               <label>Users Sent in Request</label>
               <input
                 type="number"
@@ -475,77 +475,77 @@ const Jobs: React.FC = () => {
                 className="form-control"
                 min="0"
               />
-            </div>
-            <div className="form-check mb-2">
+            </div> */}
+            {/* <div className="form-check mb-2">
               <input type="checkbox" className="form-check-input" checked={argoTokens} onChange={(e) => setArgoTokens(e.target.checked)} />
               <label className="form-check-label">Use Argo Tokens</label>
-            </div>
+            </div> */}
           </div>
         );
-      case 'consume_leads':
-        return (
-          <div>
-            <div className="form-group mb-2">
-              <label>Starting Delay (seconds)</label>
-              <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Requests</label>
-              <input type="number" value={requests} onChange={(e) => setRequests(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Batches</label>
-              <input type="number" value={batches} onChange={(e) => setBatches(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Batch Delay (seconds)</label>
-              <input type="number" value={batchDelay} onChange={(e) => setBatchDelay(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Users Sent in Request</label>
-              <input
-                type="number"
-                value={usersSentInRequest}
-                onChange={(e) => setUsersSentInRequest(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
-                className="form-control"
-                min="0"
-              />
-            </div>
-            <div className="form-check mb-2">
-              <input type="checkbox" className="form-check-input" checked={argoTokens} onChange={(e) => setArgoTokens(e.target.checked)} />
-              <label className="form-check-label">Use Argo Tokens</label>
-            </div>
-          </div>
-        );
+      // case 'consume_leads':
+      //   return (
+      //     <div>
+      //       <div className="form-group mb-2">
+      //         <label>Starting Delay (seconds)</label>
+      //         <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
+      //       </div>
+      //       <div className="form-group mb-2">
+      //         <label>Requests</label>
+      //         <input type="number" value={requests} onChange={(e) => setRequests(e.target.value)} className="form-control" />
+      //       </div>
+      //       <div className="form-group mb-2">
+      //         <label>Batches</label>
+      //         <input type="number" value={batches} onChange={(e) => setBatches(e.target.value)} className="form-control" />
+      //       </div>
+      //       <div className="form-group mb-2">
+      //         <label>Batch Delay (seconds)</label>
+      //         <input type="number" value={batchDelay} onChange={(e) => setBatchDelay(e.target.value)} className="form-control" />
+      //       </div>
+      //       <div className="form-group mb-2">
+      //         <label>Users Sent in Request</label>
+      //         <input
+      //           type="number"
+      //           value={usersSentInRequest}
+      //           onChange={(e) => setUsersSentInRequest(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+      //           className="form-control"
+      //           min="0"
+      //         />
+      //       </div>
+      //       <div className="form-check mb-2">
+      //         <input type="checkbox" className="form-check-input" checked={argoTokens} onChange={(e) => setArgoTokens(e.target.checked)} />
+      //         <label className="form-check-label">Use Argo Tokens</label>
+      //       </div>
+      //     </div>
+      //   );
       case 'send_to_user':
         return (
           <div>
-            <div className="form-group mb-2">
+            {/* <div className="form-group mb-2">
               <label>Starting Delay (seconds)</label>
               <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div>
+            </div> */}
             <div className="form-group mb-2">
               <label>Username</label>
               <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" />
             </div>
           </div>
         );
-      case 'check_conversations':
-      case 'status_check':
-        return (
-          <div>
-            <div className="form-group mb-2">
-              <label>Starting Delay (seconds)</label>
-              <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div>
-          </div>
-        );
-      case 'compute_statistics':
-        return (
-          <div className="text-muted">
-            No configuration needed for statistics computation.
-          </div>
-        );
+      // case 'check_conversations':
+      // case 'status_check':
+      //   return (
+      //     <div>
+      //       <div className="form-group mb-2">
+      //         <label>Starting Delay (seconds)</label>
+      //         <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
+      //       </div>
+      //     </div>
+      //   );
+      // case 'compute_statistics':
+      //   return (
+      //     <div className="text-muted">
+      //       No configuration needed for statistics computation.
+      //     </div>
+      //   );
       case 'generate_leads':
         return (
           <div className="generate-leads-container">
@@ -760,6 +760,8 @@ const Jobs: React.FC = () => {
     loadSources();
   }, []);
 
+  const configurationOptions = renderConfigurationOptions();
+
   return (
     <div className="container-fluid p-4">
       <ToastContainer />
@@ -892,12 +894,30 @@ const Jobs: React.FC = () => {
                     <div className="mb-2">
                       <strong className="d-block mb-1">Configuration:</strong>
                       <div className="small">
-                        {Object.entries(job.configuration).map(([key, value]) => (
-                          <div key={key} className="mb-1 text-break">
-                            <strong>{key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}:</strong>{' '}
-                            {typeof value === 'boolean' ? value.toString() : String(value)}
-                          </div>
-                        ))}
+                        {Object.entries(job.configuration)
+                          .filter(
+                            ([key]) =>
+                              ![
+                                'max_quick_add_pages',
+                                'users_sent_in_request',
+                                'argo_tokens',
+                                'batches',
+                                'batch_delay',
+                                'starting_delay'
+                              ].includes(key)
+                          )
+                          .map(([key, value]) => (
+                            <div key={key} className="mb-1 text-break">
+                              <strong>
+                                {key
+                                  .split('_')
+                                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                  .join(' ')}
+                                :
+                              </strong>{' '}
+                              {typeof value === 'boolean' ? value.toString() : String(value)}
+                            </div>
+                          ))}
                       </div>
                     </div>
                   )}
@@ -975,12 +995,12 @@ const Jobs: React.FC = () => {
             />
           </div>
 
-          {newJob.type && (
+          {newJob.type && configurationOptions && (
             <div className="mb-3">
               <label className="form-label">Configuration</label>
               <div className="card">
                 <div className="card-body">
-                  {renderConfigurationOptions()}
+                  {configurationOptions}
                 </div>
               </div>
             </div>

@@ -174,6 +174,18 @@ const GlobalAdminHome: React.FC = () => {
       },
     },
     {
+      field: 'turned_off_at',
+      headerName: 'Expires At',
+      flex: 1.2,
+      sortable: true,
+      filterable: true,
+      renderCell: (params: GridRenderCellParams<Agency>) => {
+        const row = params.row;
+        if (!row?.created_at) return 'N/A';
+        return new Date(row.created_at).toLocaleDateString();
+      },
+    },
+    {
       field: 'subscriptionStatus',
       headerName: 'Subscription Status',
       flex: 1.5,

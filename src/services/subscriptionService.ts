@@ -68,7 +68,7 @@ export const renewSubscription = async (
   data: { daysAvailable: string; numberOfSloths: string; price: string }
 ) => {
   try {
-    const response = await axios.patch(
+    const response = await axios.put(
       `${API_URL}/agencies/${agencyId}/subscriptions/renew`,
       {
         days_available: parseInt(data.daysAvailable, 10),

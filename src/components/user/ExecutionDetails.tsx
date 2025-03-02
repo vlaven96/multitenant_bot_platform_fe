@@ -125,12 +125,12 @@ const ExecutionDetails: React.FC = () => {
             <span className="label">Triggered By:</span>
             <span className="value">{execution.triggered_by}</span>
           </div>
-          <div className="detail-item">
+          {/* <div className="detail-item">
             <span className="label">Configuration:</span>
             <pre className="value parameters">
               {JSON.stringify(execution.configuration, null, 2)}
             </pre>
-          </div>
+          </div> */}
         </div>
       </div>
 

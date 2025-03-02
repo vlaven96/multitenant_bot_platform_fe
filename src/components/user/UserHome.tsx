@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Container, Typography, Grid, Card, CardContent, CardActions, Button } from '@mui/material';
+import { Container, Typography, Grid, Card, CardContent, CardActions, Button, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 function UserHome() {
@@ -11,6 +11,24 @@ function UserHome() {
       <Typography variant="h4" component="h1" gutterBottom>
         User Dashboard
       </Typography>
+        {/* New Info Section */}
+        <Box mb={4} sx={{ backgroundColor: '#f5f5f5', padding: 3, borderRadius: 2, boxShadow: 1 }}>
+        <Typography variant="h6" gutterBottom>
+          Getting Started
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          <strong>Step 1: Proxies</strong> – Begin by adding proxies to the system. We recommend not using too many accounts per proxy as this can lead to account locks.
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          <strong>Step 2: Accounts</strong> – Once proxies are set up, add your accounts. They will be automatically balanced across the available proxies.
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          <strong>Step 3: Manual Operations</strong> – With accounts created, use Manual Operations to view all available accounts and trigger actions like sending quick adds and checking conversations.
+        </Typography>
+        <Typography variant="body1" gutterBottom>
+          Additionally, you can use <strong>Jobs</strong> to automate executions and <strong>Workflows</strong> to automatically change account properties.
+        </Typography>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={4}>
           <Card>
