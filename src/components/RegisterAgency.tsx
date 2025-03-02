@@ -3,11 +3,13 @@ import { TextField, Button, Container, Typography } from '@mui/material';
 import { registerAgency } from '../services/agencyService';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 function RegisterAgency() {
   const [agencyName, setAgencyName] = useState('');
   const [agencyEmail, setAgencyEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const navigate = useNavigate();
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,6 +26,7 @@ function RegisterAgency() {
       const result = await registerAgency(agencyName, agencyEmail);
       console.log('Agency registered successfully:', result);
       toast.success('A confirmation email was sent to your email address.');
+      navigate('/');
     } catch (error) {
       console.error('Failed to register agency:', error);
       toast.error('Failed to register agency. Please try again.');

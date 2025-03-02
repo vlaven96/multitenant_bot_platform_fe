@@ -58,15 +58,14 @@ const Header: React.FC<HeaderProps> = ({
     logout();
     setIsAuthenticated(false);
     setRole(null);
-    navigate('/login');
+    navigate('/');
   };
 
-  // If the user is global admin and there's no agency selected, link to /agency
-  // Else link to /agency/<agencyIdApp>
-  const dashboardLink =
-    isGlobalAdmin && !agencyIdApp
-      ? '/agency'
-      : `/agency/${agencyIdApp}`;
+  const dashboardLink = !isAuthenticated
+    ? '/'
+    : isGlobalAdmin && !agencyIdApp
+    ? '/agency'
+    : `/agency/${agencyIdApp}`;
 
   return (
     <AppBar
