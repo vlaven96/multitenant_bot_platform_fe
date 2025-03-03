@@ -6,11 +6,12 @@ import Select, { MultiValue, SingleValue } from 'react-select';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { toast } from 'react-toastify';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, OverlayTrigger, Popover } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams } from 'react-router-dom';
+
 interface SelectOption {
   value: string;
   label: string;
@@ -980,7 +981,29 @@ const Jobs: React.FC = () => {
 
           <div className="mb-3">
             <label className="form-label">Cron Expression</label>
-            <input type="text" name="cron_expression" placeholder="0 0 * * *" value={newJob.cron_expression} onChange={handleInputChange} className="form-control" />
+            <OverlayTrigger
+              trigger="click"
+              placement="right"
+              overlay={
+                <Popover id="cron-popover">
+                  <Popover.Body>
+                    Use <a href="https://www.freeformatter.com/cron-expression-generator-quartz.html" target="_blank" rel="noopener noreferrer">this tool</a> to generate a cron expression.
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <span className="d-inline-block">
+                <i className="bi bi-info-circle" style={{ cursor: 'pointer' }}></i>
+              </span>
+            </OverlayTrigger>
+            <input
+              type="text"
+              name="cron_expression"
+              placeholder="0 0 * * *"
+              value={newJob.cron_expression}
+              onChange={handleInputChange}
+              className="form-control"
+            />
           </div>
 
           <div className="mb-3">
