@@ -84,8 +84,8 @@ const EditSnapchatAccount: React.FC = () => {
         }
         const data = await fetchAccountForEdit(agencyId, id);
         setAccountDetails(data);
-        setSelectedModel(data.account.model?.id || null);
-        setSelectedChatBot(data.account.chat_bot?.id || null);
+        // setSelectedModel(data.account.model?.id || null);
+        // setSelectedChatBot(data.account.chat_bot?.id || null);
         setSelectedStatus(data.account.status || null);
         setSelectedProxy(data.account.proxy?.id || null);
         setTags(data.account.tags?.map(tag => ({ label: tag, value: tag })) || []);
@@ -114,8 +114,8 @@ const EditSnapchatAccount: React.FC = () => {
         return;
       }
       await updateAccount(agencyId, id, {
-        model_id: selectedModel,
-        chatbot_id: selectedChatBot,
+        // model_id: selectedModel,
+        // chatbot_id: selectedChatBot,
         status: selectedStatus,
         proxy_id: selectedProxy,
         workflow_id: selectedWorkflow,
@@ -131,7 +131,7 @@ const EditSnapchatAccount: React.FC = () => {
   };
 
   const isFormValid = () => {
-    return selectedStatus !== null && selectedModel !== null && selectedChatBot !== null;
+    return selectedStatus !== null;
   };
 
   if (loading) {
@@ -146,7 +146,7 @@ const EditSnapchatAccount: React.FC = () => {
     <div className="edit-account-container">
       <h2>Edit Snapchat Account: {accountDetails.account.username}</h2>
       <form onSubmit={handleSubmit} className="edit-form">
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Model:</label>
           <select
             value={selectedModel || ''}
@@ -165,9 +165,9 @@ const EditSnapchatAccount: React.FC = () => {
               Current: {accountDetails.account.model.name}
             </div>
           )}
-        </div>
+        </div> */}
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>ChatBot:</label>
           <select
             value={selectedChatBot || ''}
@@ -186,7 +186,7 @@ const EditSnapchatAccount: React.FC = () => {
               Current: {accountDetails.account.chat_bot.type}
             </div>
           )}
-        </div>
+        </div> */}
 
         <div className="form-group">
           <label>Status:</label>
@@ -274,14 +274,14 @@ const EditSnapchatAccount: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/admin/accounts')}
+            onClick={() => navigate(`/agency/${agencyId}/accounts`)}
             className="btn btn-secondary"
           >
             Cancel
           </button>
         </div>
       </form>
-      {/* <ToastContainer /> */}
+      <ToastContainer />
     </div>
   );
 };

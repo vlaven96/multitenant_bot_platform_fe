@@ -296,7 +296,8 @@ function Accounts() {
       console.error('Agency ID is undefined');
       return;
     }
-
+    const selectedIds = [...selectionModel];
+    console.log("Selected IDs: ", selectedIds);
     try {
       await bulkUpdateAccounts(agencyId, {
         account_ids: selectionModel.map(id => parseInt(id)), // Convert string IDs to numbers
@@ -312,24 +313,25 @@ function Accounts() {
         autoClose: 3000
       });
       setIsBulkUpdateModalOpen(false);
-      setSelectionModel([]);
+      
 
       // Reload the accounts to reflect changes
       const data = await fetchAccounts(agencyId, () => {});
-      setAccounts(data);
-
-      // Update tags in the state
-      setAccounts(prevAccounts =>
-        prevAccounts.map(account => {
-          if (selectionModel.includes(account.id)) {
-            const newTags = new Set(account.tags || []);
-            updates.tagsToAdd?.forEach(tag => newTags.add(tag));
-            updates.tagsToRemove?.forEach(tag => newTags.delete(tag));
-            return { ...account, tags: Array.from(newTags) };
-          }
-          return account;
-        })
-      );
+      // setAccounts(data);
+      const updatedAccounts = data.map(account => {
+        if (selectedIds.includes(account.id)) {
+          const newTags = new Set(account.tags || []);
+          updates.tagsToAdd?.forEach(tag => newTags.add(tag));
+          updates.tagsToRemove?.forEach(tag => newTags.delete(tag));
+          return { ...account, tags: Array.from(newTags) };
+        }
+        return account;
+      });
+  
+      // Update accounts state in one go
+      setAccounts(updatedAccounts);
+      // Clear the selection so the grid reflects no rows selected
+      setSelectionModel([]);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.detail || error.message || 'Failed to bulk update accounts';
@@ -453,7 +455,7 @@ function Accounts() {
               role="button"
               onClick={() => openModal(proxy ? JSON.stringify(proxy, null, 2) : 'Not Associated')}
             >
-              {proxy ? proxy.host : 'Not Associated'}
+              {proxy ? `${proxy.host}:${proxy.port}` : 'Not Associated'}
             </span>
           );
         },
@@ -550,8 +552,6 @@ function Accounts() {
         sortable: true,
         filterable: true,
         valueGetter: (params: GridValueGetterParams<Account, any>) => {
-          console.log("WORKFLOW_________")
-          console.log(params);
           return params?.name || 'No Workflow';
         },
       },

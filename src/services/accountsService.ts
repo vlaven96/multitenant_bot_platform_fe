@@ -184,8 +184,8 @@ export const updateAccount = async (
   agencyId: string,
   id: string,
   data: {
-    model_id: number | null;
-    chatbot_id: number | null;
+    // model_id: number | null;
+    // chatbot_id: number | null;
     status: string | null;
     proxy_id: number | null;
     workflow_id: number | null;

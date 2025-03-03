@@ -1,0 +1,36 @@
+/* Overlay container covers the entire viewport */
+.tag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* ensure it's above other elements */
+  }
+  
+  /* Content inside the overlay */
+  .tag-overlay-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+  }
+  
+  /* Button container styling */
+  .tag-overlay-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  
+  .tag-overlay-buttons button {
+    margin-left: 10px;
+    padding: 6px 12px;
+    font-size: 1em;
+  }
+  

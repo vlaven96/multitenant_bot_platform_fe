@@ -38,7 +38,7 @@ interface Account {
   email_password?: string;
   creation_date?: string;
   added_to_system_date?: string;
-  proxy?: { id: number; host: string };
+  proxy?: { id: number; host: string; port: string };
   // device?: { id: number; data: string };
   // cookies?: { data: string };
   // model?: {
@@ -523,6 +523,8 @@ const ManualOperations: React.FC = () => {
         field: 'proxy',
         headerName: 'Proxy',
         flex: 1,
+        sortable: false,
+        filterable: false,
         renderCell: (params: GridRenderCellParams<Account>) => {
           const proxy = params.row.proxy;
           return (
@@ -530,7 +532,7 @@ const ManualOperations: React.FC = () => {
               className="clickable-cell"
               onClick={() => openModal(proxy ? JSON.stringify(proxy, null, 2) : 'Not Associated')}
             >
-              {proxy ? proxy.host : 'Not Associated'}
+              {proxy ? `${proxy.host}:${proxy.port}` : 'Not Associated'}
             </span>
           );
         },
