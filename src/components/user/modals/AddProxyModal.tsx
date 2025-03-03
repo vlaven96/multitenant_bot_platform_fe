@@ -10,7 +10,13 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
+  Box,
+  Typography,
+  TextField,
+  Tooltip,
+  IconButton,
 } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 
 interface AddProxyModalProps {
   isOpen: boolean;
@@ -61,19 +67,21 @@ const AddProxyModal: React.FC<AddProxyModalProps> = ({ isOpen, onRequestClose })
     };
 
     return (
-      <div
-        style={{
+      <Box
+        sx={{
           display: 'flex',
           maxHeight: '400px',
           overflow: 'hidden',
           fontFamily: 'monospace',
           border: '1px solid #ccc',
           backgroundColor: '#f8f9fa',
+          borderRadius: 1,
+          boxShadow: 1,
         }}
       >
-        <div
+        <Box
           ref={lineNumbersRef}
-          style={{
+          sx={{
             flex: '0 0 auto',
             textAlign: 'right',
             marginRight: '10px',
@@ -83,17 +91,18 @@ const AddProxyModal: React.FC<AddProxyModalProps> = ({ isOpen, onRequestClose })
             backgroundColor: '#e9ecef',
             padding: '10px',
             lineHeight: '1.5',
+            borderRight: '1px solid #ccc',
           }}
         >
           {lines.map((_, index) => `${index + 1}\n`).join('')}
-        </div>
+        </Box>
 
         <textarea
           ref={textAreaRef}
           value={proxyText}
           onChange={(e) => setProxyText(e.target.value)}
           onScroll={handleScroll}
-          placeholder="Enter proxies (one per line) in format: host username password"
+          placeholder="Enter proxies (one per line) in format: host:port:username:password"
           rows={lines.length}
           style={{
             flex: 1,
@@ -105,9 +114,10 @@ const AddProxyModal: React.FC<AddProxyModalProps> = ({ isOpen, onRequestClose })
             whiteSpace: 'pre',
             fontFamily: 'monospace',
             padding: '10px',
+            backgroundColor: 'transparent',
           }}
         />
-      </div>
+      </Box>
     );
   };
 
@@ -118,13 +128,30 @@ const AddProxyModal: React.FC<AddProxyModalProps> = ({ isOpen, onRequestClose })
       maxWidth="md"
       fullWidth
     >
-      <DialogTitle>Add Proxy</DialogTitle>
+      <DialogTitle>
+        Add Proxy
+        <Tooltip
+          title={
+            <Typography variant="body2">
+              <strong>Proxy Guide:</strong> A proxy acts as a middleman between your device and the internet, masking your IP for security and privacy. <br />
+              <strong>Accepted format:</strong> <code>host:port:username:password</code> <br />
+              Using proxies helps prevent account locks by ensuring consistent IP usage.
+            </Typography>
+
+          }
+          arrow
+        >
+          <IconButton size="small" sx={{ ml: 1 }}>
+            <InfoIcon />
+          </IconButton>
+        </Tooltip>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText>
           Enter the proxy details below.
         </DialogContentText>
         {renderNumberedTextArea()}
-        {errorMessage && <div className="text-danger mt-2">{errorMessage}</div>}
+        {errorMessage && <Typography color="error" sx={{ mt: 2 }}>{errorMessage}</Typography>}
       </DialogContent>
       <DialogActions>
         <Button onClick={onRequestClose} color="secondary">

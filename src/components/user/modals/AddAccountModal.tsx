@@ -37,16 +37,15 @@ interface AddAccountModalProps {
 }
 
 const PLACEHOLDER_OPTIONS = [
-  { label: 'two_fa_secret', value: 'two_fa_secret' },
-  { label: 'proxy', value: 'proxy' },
-  { label: 'username', value: 'username' },
-  { label: 'password', value: 'password' },
-  { label: 'email', value: 'email' },
-  { label: 'email_password', value: 'email_password' },
-  { label: 'creation_date', value: 'creation_date' },
-  { label: 'snapchat_link', value: 'snapchat_link' },
-  // We can also include [spaces] as an item:
-  { label: '[spaces]', value: '[spaces]' },
+  { id: 'two_fa_secret', label: 'two_fa_secret', value: 'two_fa_secret' },
+  { id: 'proxy', label: 'proxy', value: 'proxy' },
+  { id: 'username', label: 'username', value: 'username' },
+  { id: 'password', label: 'password', value: 'password' },
+  { id: 'email', label: 'email', value: 'email' },
+  { id: 'email_password', label: 'email_password', value: 'email_password' },
+  { id: 'creation_date', label: 'creation_date', value: 'creation_date' },
+  { id: 'snapchat_link', label: 'snapchat_link', value: 'snapchat_link' },
+  { id: '[spaces]', label: '[spaces]', value: '[spaces]' },
 ];
 
 /**
@@ -153,6 +152,9 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
   //  Submitting the form
   // ---------------------
   const handleSubmit = async () => {
+    console.log("Intra aici baiatanule")
+    console.log(selectedSource)
+    console.log(inputText)
     if (!selectedSource || !inputText.trim()) {
       setErrorMessage('Please fill in all required fields (Source & Accounts).');
       return;
@@ -165,9 +167,9 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
         data: inputText,
         model_id: selectedModel,    // or parseInt if needed
         chatbot_id: selectedChatbot, // or parseInt if needed
-        source: selectedSource.value,
+        source: selectedSource,
         workflow_id: selectedWorkflow,
-        trigger_execution: triggerExecution,
+        trigger_execution: true,
         pattern: finalPattern,
       };
 
@@ -235,6 +237,9 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
             onScroll={handleScroll}
             placeholder="Enter accounts (one per line)"
             rows={lines.length}
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
             style={{
               width: '100%',
               height: '100%',
@@ -279,31 +284,51 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
 
   const renderPatternBuilder = () => {
     const finalPatternPreview = buildPatternString(patternItems);
-
+  
     return (
       <Box sx={{ mt: 1 }}>
         <Typography variant="subtitle1" gutterBottom>
           Build your pattern by selecting placeholders:
         </Typography>
-
+  
         <Autocomplete
           multiple
+          freeSolo
           options={PLACEHOLDER_OPTIONS}
           getOptionLabel={(option) => option.label}
-          value={placeholdersAsObjects}
-          onChange={handleAutocompleteChange}
+          // Compare options by unique id so duplicates are allowed
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={autocompleteValue}
+          onChange={(event, newValue) => {
+            const processedValue = newValue.map((item) => {
+              // If a freeSolo string is entered, convert it into an object with a unique id.
+              if (typeof item === 'string') {
+                return {
+                  id: `${item}-${Math.random().toString(36).substring(2, 9)}`,
+                  label: item,
+                  value: item,
+                };
+              }
+              // For objects (whether from the options or duplicates), assign a new unique id.
+              return { ...item, id: `${item.value}-${Math.random().toString(36).substring(2, 9)}` };
+            });
+            setAutocompleteValue(processedValue);
+            // Update the patternItems using the 'value' property from each object.
+            setPatternItems(processedValue.map((item) => item.value));
+          }}
           renderInput={(params) => (
             <TextField {...params} label="Select placeholders" variant="outlined" />
           )}
           sx={{ mb: 2, width: 400 }}
         />
-
+  
         <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
           <strong>Preview:</strong> {finalPatternPreview || '(empty)'}
         </Typography>
       </Box>
     );
   };
+  
 
   // ---------------------
   //  Render
@@ -355,25 +380,26 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
 
         {/* Source Selection */}
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <Autocomplete
-            freeSolo
-            options={sources} // assuming sources is an array of objects with { label, value }
-            value={selectedSource}
-            onChange={(event, newValue) => {
-              setSelectedSource(newValue);
-            }}
-            // When using objects, specify how to display each option
-            getOptionLabel={(option) =>
-              typeof option === 'string' ? option : option.label || ''
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Source"
-                variant="outlined"
-              />
-            )}
-          />
+        <Autocomplete
+          freeSolo
+          options={sources.map((option) => option.value)}
+          value={selectedSource}
+          onChange={(event, newValue) => {
+            // newValue can be a string or null.
+            setSelectedSource(typeof newValue === 'string' ? newValue : newValue || '');
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Source"
+              variant="outlined"
+              onBlur={(e) => {
+                // When leaving the input, update the state with the current text.
+                setSelectedSource(e.target.value);
+              }}
+            />
+          )}
+        />
       </FormControl>
 
         {/* Workflow Selection */}
@@ -398,7 +424,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
         </FormControl>
 
         {/* Trigger Execution */}
-        <FormControlLabel
+        {/* <FormControlLabel
           sx={{ mb: 2 }}
           control={
             <Switch
@@ -407,7 +433,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
             />
           }
           label="Trigger Execution"
-        />
+        /> */}
 
         {/* Enable Pattern */}
         <FormControlLabel

@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import grafanaLogo from '../../assets/grafana-logo.png';
 import './SnapchatAccountDetails.css';
 import Timeline from './Timeline';
+import { Typography, Box, Paper } from '@mui/material';
 
 interface AccountExecution {
   type: string;
@@ -23,6 +24,15 @@ interface SnapchatAccountTimelineStatistics {
   ingestion_date: string;
   account_executions: AccountExecution[];
   status_changes: StatusChange[];
+}
+
+interface AccountDetails {
+  id: string;
+  username: string;
+  two_fa_secret?: string;
+  email?: string;
+  email_password?: string;
+  // Add other fields as necessary
 }
 
 const SnapchatAccountDetails: React.FC = () => {
@@ -48,6 +58,7 @@ const SnapchatAccountDetails: React.FC = () => {
   const [loadingStats, setLoadingStats] = useState(false);
   const [timelineStats, setTimelineStats] = useState<SnapchatAccountTimelineStatistics | null>(null);
   const [loadingTimeline, setLoadingTimeline] = useState(false);
+  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null);
 
   useEffect(() => {
     const loadAccountDetails = async () => {
@@ -59,6 +70,7 @@ const SnapchatAccountDetails: React.FC = () => {
         }
         const accountData = await fetchAccountDetails(agencyId, accountId);
         setAccount(accountData);
+        setAccountDetails(accountData);
       } catch (error) {
         console.error('Failed to load account details:', error);
       }
@@ -297,11 +309,24 @@ const SnapchatAccountDetails: React.FC = () => {
                     </a>
                   ) : 'Not Available'}
                 </ListGroupItem>
-                <ListGroupItem>Password: {account.password}</ListGroupItem>
-                <ListGroupItem>2FA Secret: {account.two_fa_secret}</ListGroupItem>
+                {accountDetails?.two_fa_secret && (
+                  <ListGroupItem>2FA Secret: {accountDetails.two_fa_secret}</ListGroupItem>
+                )}
+                {accountDetails?.email && (
+                  <ListGroupItem>Email: {accountDetails.email}</ListGroupItem>
+                )}
+                {accountDetails?.email_password && (
+                  <ListGroupItem>Email Password: {accountDetails.email_password}</ListGroupItem>
+                )}
                 <ListGroupItem>Creation Date: {account.creation_date}</ListGroupItem>
                 <ListGroupItem>Added to System Date: {account.added_to_system_date}</ListGroupItem>
-                <ListGroupItem>Proxy: {account.proxy ? (
+                
+              </ListGroup>
+            </div>
+
+            <div>
+              <ListGroup>
+              <ListGroupItem>Proxy: {account.proxy ? (
                   <span 
                     onClick={() => handleJsonClick(account.proxy)} 
                     style={{ 
@@ -310,17 +335,12 @@ const SnapchatAccountDetails: React.FC = () => {
                       textDecoration: 'underline'
                     }}
                   >
-                    View Details
+                    {account.proxy?.host}:{account.proxy?.port}
                   </span>
                 ) : 'Not Available'}</ListGroupItem>
                 {account.workflow?.name && (
                   <ListGroupItem>Workflow: {account.workflow.name}</ListGroupItem>
                 )}
-              </ListGroup>
-            </div>
-
-            <div>
-              <ListGroup>
                 {/* <ListGroupItem>Device Model: {account.device ? <span onClick={() => handleJsonClick(account.device)}>View Details</span> : 'Not Available'}</ListGroupItem>
                 <ListGroupItem>Cookies: {account.cookies ? <span onClick={() => handleJsonClick(account.cookies)}>View Details</span> : 'Not Available'}</ListGroupItem>
                 <ListGroupItem>Model: {account.model?.name}</ListGroupItem>
