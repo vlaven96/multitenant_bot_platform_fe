@@ -93,8 +93,12 @@ export const inviteUser = async (agencyId: string, email: string) => {
       }
     );
     return response.data;
-  } catch (error) {
-    console.error("Error inviting user:", error);
-    throw error;
+  } catch (error: any) {
+    if (error.response) {
+      // Propagate the error response from the server
+      throw new Error(error.response.data.detail || "Error inviting user");
+    } else {
+      throw new Error("Error inviting user");
+    }
   }
 };

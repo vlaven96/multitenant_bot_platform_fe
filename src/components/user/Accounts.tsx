@@ -405,6 +405,21 @@ function Accounts() {
         },
       },
       {
+        field: 'email',
+        headerName: 'Email',
+        flex: 1,
+        sortable: true,
+        filterable: true,
+      },
+      {
+        field: 'email_password',
+        headerName: 'Email Password',
+        flex: 1,
+        sortable: true,
+        filterable: true,
+      },
+
+      {
         field: 'two_fa_secret',
         headerName: '2FA Secret',
         flex: 1,

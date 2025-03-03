@@ -34,6 +34,8 @@ interface Account {
   username: string;
   snapchat_link?: string;
   two_fa_secret?: string;
+  email?: string;
+  email_password?: string;
   creation_date?: string;
   added_to_system_date?: string;
   proxy?: { id: number; host: string };
@@ -118,6 +120,8 @@ const ManualOperations: React.FC = () => {
       username: true,
       snapchat_link: true,
       two_fa_secret: true,
+      email: true,
+      email_password: true,
       creation_date: true,
       added_to_system_date: true,
       proxy: true,
@@ -479,6 +483,20 @@ const ManualOperations: React.FC = () => {
             </a>
           );
         },
+      },
+      {
+        field: 'email',
+        headerName: 'Email',
+        flex: 1,
+        sortable: true,
+        filterable: true,
+      },
+      {
+        field: 'email_password',
+        headerName: 'Email Password',
+        flex: 1,
+        sortable: true,
+        filterable: true,
       },
       {
         field: 'two_fa_secret',

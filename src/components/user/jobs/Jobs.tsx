@@ -423,7 +423,7 @@ const Jobs: React.FC = () => {
 
   const handleViewExecutions = (jobId: number) => {
     // Open in new tab with job pre-selected
-    window.open(`/user/executions?job=${jobId}`, '_blank');
+    window.open(`/agency/${agencyId}/executions?job=${jobId}`, '_blank');
   };
 
   const fetchAssociatedUsernamesHandler = async (jobId: number) => {
@@ -890,7 +890,7 @@ const Jobs: React.FC = () => {
                   )}
 
                   {/* Configuration Details */}
-                  {job.type !== 'COMPUTE_STATISTICS' && (
+                  {job.type == 'QUICK_ADDS' && (
                     <div className="mb-2">
                       <strong className="d-block mb-1">Configuration:</strong>
                       <div className="small">
@@ -1083,7 +1083,7 @@ const Jobs: React.FC = () => {
                 <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                   <span>{account.username}</span>
                   <a  
-                    href={`/snapchat-account/${account.id}`}
+                    href={`/agency/${agencyId}/snapchat-account/${account.id}`}
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="btn btn-outline-primary btn-sm"

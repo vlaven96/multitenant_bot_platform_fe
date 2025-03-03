@@ -118,7 +118,6 @@ const Users: React.FC = () => {
       console.error('Agency ID is undefined');
       return;
     }
-    // Email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(inviteEmail)) {
       toast.error('Please enter a valid email address.', {
@@ -145,8 +144,9 @@ const Users: React.FC = () => {
       });
       setOpen(false);
       setInviteEmail('');
-    } catch (error) {
-      toast.error('Error sending invitation. Please try again.', {
+    } catch (error: any) {
+      const errorMessage = error.message || 'Error sending invitation. Please try again.';
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -155,6 +155,8 @@ const Users: React.FC = () => {
         draggable: true,
         progress: undefined,
       });
+      setOpen(false);
+      setInviteEmail('');
       console.error('Error sending invitation:', error);
     }
   };
