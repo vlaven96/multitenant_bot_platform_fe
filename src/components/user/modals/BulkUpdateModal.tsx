@@ -259,10 +259,10 @@ const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ isOpen, onClose, onCo
             </div>
           )}
 
-          <hr />
+          {/* <hr /> */}
 
           {/* ==================== Update Model ==================== */}
-          <FormGroup check>
+          {/* <FormGroup check>
             <Input
               type="checkbox"
               id="updateModelCheckbox"
@@ -287,12 +287,12 @@ const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ isOpen, onClose, onCo
                 {modelOptions}
               </Input>
             </FormGroup>
-          )}
+          )} */}
 
-          <hr />
+          {/* <hr /> */}
 
           {/* ==================== Update ChatBot ==================== */}
-          <FormGroup check>
+          {/* <FormGroup check>
             <Input
               type="checkbox"
               id="updateChatBotCheckbox"
@@ -317,7 +317,7 @@ const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ isOpen, onClose, onCo
                 {chatBotOptions}
               </Input>
             </FormGroup>
-          )}
+          )} */}
         </Form>
       </ModalBody>
 

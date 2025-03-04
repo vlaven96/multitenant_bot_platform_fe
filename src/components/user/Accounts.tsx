@@ -317,21 +317,23 @@ function Accounts() {
 
       // Reload the accounts to reflect changes
       const data = await fetchAccounts(agencyId, () => {});
+      console.log("Data: ", data);
       // setAccounts(data);
       const updatedAccounts = data.map(account => {
-        if (selectedIds.includes(account.id)) {
-          const newTags = new Set(account.tags || []);
-          updates.tagsToAdd?.forEach(tag => newTags.add(tag));
-          updates.tagsToRemove?.forEach(tag => newTags.delete(tag));
-          return { ...account, tags: Array.from(newTags) };
-        }
-        return account;
-      });
-  
-      // Update accounts state in one go
-      setAccounts(updatedAccounts);
-      // Clear the selection so the grid reflects no rows selected
-      setSelectionModel([]);
+            if (selectedIds.includes(account.id)) {
+              console.log("Account ID: ", account.id);
+              const newTags = new Set(account.tags || []);
+              updates.tagsToAdd?.forEach(tag => newTags.add(tag));
+              updates.tagsToRemove?.forEach(tag => newTags.delete(tag));
+              return { ...account, tags: Array.from(newTags) };
+            }
+            return account;
+          });
+
+    // Update accounts state in one go
+    setAccounts(updatedAccounts);
+    // Clear the selection so the grid reflects no rows selected
+    setSelectionModel([]);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.detail || error.message || 'Failed to bulk update accounts';
