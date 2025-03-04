@@ -9,10 +9,10 @@ import {
   MenuItem,
   Box,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
-import { logout } from '../services/authService';
+import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import { logout } from '../services/authService';
 
 interface HeaderProps {
   isAdmin: boolean;
@@ -20,18 +20,16 @@ interface HeaderProps {
   isGlobalAdmin: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   setRole: React.Dispatch<React.SetStateAction<string | null>>;
-
-  // This is the agency ID we store in App state
-  agencyIdApp: string;
+  agencyIdApp: string; // The agency ID we store in App state
 }
 
-// A styled version of Link that inherits MUI theme colors and styles.
+// A styled Link for consistency with MUI styles:
 const StyledLink = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
   color: theme.palette.common.white,
   fontWeight: 500,
   '&:hover': {
-    color: theme.palette.grey[500],
+    color: theme.palette.grey[300],
   },
 }));
 
@@ -49,7 +47,6 @@ const Header: React.FC<HeaderProps> = ({
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -61,6 +58,7 @@ const Header: React.FC<HeaderProps> = ({
     navigate('/');
   };
 
+  // Decide where the main brand link points:
   const dashboardLink = !isAuthenticated
     ? '/'
     : isGlobalAdmin && !agencyIdApp
@@ -76,140 +74,136 @@ const Header: React.FC<HeaderProps> = ({
       }}
     >
       <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1, fontWeight: 'bold' }}
-        >
-          <StyledLink to={dashboardLink}>
-            Dashboard
-          </StyledLink>
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {isAuthenticated && (
-            <>
-              <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                aria-label="menu"
-                sx={{ mr: 2 }}
-                onClick={handleMenu}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                {/* Render links only if we have an agency ID (and user is admin where needed) */}
-                {agencyIdApp && isAdmin && (
+        {/* Brand Section (Logo + Title) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+          <Box
+            component="img"
+            // Point this to your actual logo file or a public URL:
+            src="/snep_logo_round.png"
+            alt="SnepFlow Logo"
+            sx={{ height: 40, mr: 1 }}
+          />
+          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <StyledLink to={dashboardLink}>
+              SnepFlow
+            </StyledLink>
+          </Typography>
+        </Box>
+
+        {/* Right Section: Menu + Logout/Login */}
+        {isAuthenticated && (
+          <>
+            <IconButton
+              size="large"
+              color="inherit"
+              sx={{ mr: 2 }}
+              onClick={handleMenu}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              {/* Conditionally show links if agencyIdApp is set */}
+              {agencyIdApp && isAdmin && (
+                <MenuItem
+                  component={StyledLink}
+                  to={`/agency/${agencyIdApp}/subscription`}
+                  onClick={handleClose}
+                >
+                  Subscription
+                </MenuItem>
+              )}
+              {agencyIdApp && (
+                <>
                   <MenuItem
                     component={StyledLink}
-                    to={`/agency/${agencyIdApp}/subscription`}
+                    to={`/agency/${agencyIdApp}/jobs`}
                     onClick={handleClose}
                   >
-                    Subscription
+                    Jobs
                   </MenuItem>
-                )}
-                {agencyIdApp && (
-                  <>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/workflows`}
+                    onClick={handleClose}
+                  >
+                    Workflows
+                  </MenuItem>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/manual-operations`}
+                    onClick={handleClose}
+                  >
+                    Manual Operations
+                  </MenuItem>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/executions`}
+                    onClick={handleClose}
+                  >
+                    Executions
+                  </MenuItem>
+                  {isAdmin && (
                     <MenuItem
                       component={StyledLink}
-                      to={`/agency/${agencyIdApp}/jobs`}
+                      to={`/agency/${agencyIdApp}/admin/users`}
                       onClick={handleClose}
                     >
-                      Jobs
+                      Manage Users
                     </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/workflows`}
-                      onClick={handleClose}
-                    >
-                      Workflows
-                    </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/manual-operations`}
-                      onClick={handleClose}
-                    >
-                      Manual Operations
-                    </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/executions`}
-                      onClick={handleClose}
-                    >
-                      Executions
-                    </MenuItem>
-                    {isAdmin && (
-                      <MenuItem
-                        component={StyledLink}
-                        to={`/agency/${agencyIdApp}/admin/users`}
-                        onClick={handleClose}
-                      >
-                        Manage Users
-                      </MenuItem>
-                    )}
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/proxies`}
-                      onClick={handleClose}
-                    >
-                      Manage Proxies
-                    </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/accounts`}
-                      onClick={handleClose}
-                    >
-                      Manage Accounts
-                    </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/models`}
-                      onClick={handleClose}
-                    >
-                      Manage Models
-                    </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/chatbots`}
-                      onClick={handleClose}
-                    >
-                      Manage Chatbots
-                    </MenuItem>
-                    <MenuItem
-                      component={StyledLink}
-                      to={`/agency/${agencyIdApp}/statistics`}
-                      onClick={handleClose}
-                    >
-                      Statistics
-                    </MenuItem>
-                  </>
-                )}
-              </Menu>
-            </>
-          )}
-          <Button
-            color="inherit"
-            onClick={isAuthenticated ? handleLogout : () => navigate('/login')}
-            sx={{ ml: 2 }}
-          >
-            {isAuthenticated ? 'Logout' : 'Login'}
-          </Button>
-        </Box>
+                  )}
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/proxies`}
+                    onClick={handleClose}
+                  >
+                    Manage Proxies
+                  </MenuItem>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/accounts`}
+                    onClick={handleClose}
+                  >
+                    Manage Accounts
+                  </MenuItem>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/models`}
+                    onClick={handleClose}
+                  >
+                    Manage Models
+                  </MenuItem>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/chatbots`}
+                    onClick={handleClose}
+                  >
+                    Manage Chatbots
+                  </MenuItem>
+                  <MenuItem
+                    component={StyledLink}
+                    to={`/agency/${agencyIdApp}/statistics`}
+                    onClick={handleClose}
+                  >
+                    Statistics
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+          </>
+        )}
+        <Button
+          color="inherit"
+          onClick={isAuthenticated ? handleLogout : () => navigate('/login')}
+        >
+          {isAuthenticated ? 'Logout' : 'Login'}
+        </Button>
       </Toolbar>
     </AppBar>
   );
