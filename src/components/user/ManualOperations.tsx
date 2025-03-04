@@ -1069,7 +1069,7 @@ const ManualOperations: React.FC = () => {
             onRowSelectionModelChange={(newSelection) => {
               setSelectionModel(newSelection);
             }}
-            selectionModel={selectionModel}
+            rowSelectionModel={selectionModel}
             components={{
               Toolbar: CustomToolbar,
               Footer: CustomFooter

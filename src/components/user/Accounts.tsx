@@ -669,7 +669,7 @@ function Accounts() {
                   // newSelection is typically an array of selected row IDs
                   setSelectionModel(newSelection as string[]);
                 }}
-                selectionModel={selectionModel}
+                rowSelectionModel={selectionModel}
                 components={{
                   Toolbar: CustomToolbar,
                   Footer: CustomFooter,
