@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import makeAnimated from 'react-select/animated';
 import Dialog from '@mui/material/Dialog';
@@ -10,7 +10,7 @@ import { Box } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface TagCellProps {
-  row: any; // replace with your specific type if needed
+  row: any; // Replace with a more specific type (e.g. Account) if desired
   existingTags: string[];
   onTagsUpdate: (rowId: string, newTags: string[]) => Promise<void>;
 }
@@ -18,6 +18,11 @@ interface TagCellProps {
 const TagCell: React.FC<TagCellProps> = ({ row, existingTags, onTagsUpdate }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [localTags, setLocalTags] = useState<string[]>(row.tags || []);
+
+  // IMPORTANT: Sync local tags with row.tags on parent changes
+  useEffect(() => {
+    setLocalTags(row.tags || []);
+  }, [row.tags]);
 
   const handleSaveTags = async () => {
     try {
