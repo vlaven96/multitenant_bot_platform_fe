@@ -98,7 +98,7 @@ function UserHome() {
             </CardActions>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        {/* <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>
               <Typography variant="h5" component="div">
@@ -114,8 +114,8 @@ function UserHome() {
               </Button>
             </CardActions>
           </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
+        </Grid> */}
+        {/* <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>
               <Typography variant="h5" component="div">
@@ -131,7 +131,7 @@ function UserHome() {
               </Button>
             </CardActions>
           </Card>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} sm={6} md={4}>
           <Card>
             <CardContent>
