@@ -14,7 +14,7 @@ export const fetchProxies = async (agencyId: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/proxies`,
+      `${API_URL}/agencies/${agencyId}/proxies/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -36,7 +36,7 @@ export const addProxy = async (agencyId: string, proxyData: string) => {
   }
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/proxies`,
+      `${API_URL}/agencies/${agencyId}/proxies/`,
       { data: proxyData },
       {
         headers: {
@@ -59,7 +59,7 @@ export const deleteProxy = async (agencyId: string, proxyId: string) => {
   }
   try {
     const response = await axios.delete(
-      `${API_URL}/agencies/${agencyId}/proxies/${proxyId}`,
+      `${API_URL}/agencies/${agencyId}/proxies/${proxyId}/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,

@@ -48,7 +48,7 @@ export const executeOperation = async (agencyId: string, params: {
       accounts: params.userIds,
     };
 
-    const response = await axios.post(`${API_URL}/agencies/${agencyId}/executions`, payload, {
+    const response = await axios.post(`${API_URL}/agencies/${agencyId}/executions/`, payload, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -79,7 +79,7 @@ export const fetchExecutions = async (
     if (executionType) params.execution_type = executionType;
     if (jobId) params.job_id = jobId;
 
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/executions`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/executions/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -125,7 +125,7 @@ export const fetchExecutionDetailsByAccount = async (
       params.execution_type = executionType;
 
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/executions/by_snapchat_account/${id}`,
+      `${API_URL}/agencies/${agencyId}/executions/by_snapchat_account/${id}/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -149,7 +149,7 @@ export const addExecution = async (agencyId: string, executionData: any) => {
   }
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/executions`,
+      `${API_URL}/agencies/${agencyId}/executions/`,
       executionData,
       {
         headers: {
@@ -169,7 +169,7 @@ export const deleteExecution = async (agencyId: string, executionId: string) => 
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.delete(`${API_URL}/agencies/${agencyId}/executions/${executionId}`, {
+    const response = await axios.delete(`${API_URL}/agencies/${agencyId}/executions/${executionId}/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

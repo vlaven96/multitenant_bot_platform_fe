@@ -9,7 +9,7 @@ export const fetchStatistics = async (agencyId: string) => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -27,7 +27,7 @@ export const fetchAccountStatistics = async (agencyId: string, accountId: string
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/accounts/${accountId}/statistics`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/accounts/${accountId}/statistics/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -45,7 +45,7 @@ export const fetchOverallStatistics = async (agencyId: string) => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -65,7 +65,7 @@ export const fetchStatusStatistics = async (agencyId: string) => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/statuses`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/statuses/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -86,7 +86,7 @@ export const fetchAverageTimesBySource = async (agencyId: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/statistics/average-times-by-source`,
+      `${API_URL}/agencies/${agencyId}/statistics/average-times-by-source/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -109,7 +109,7 @@ export const fetchExecutionCountsBySource = async (agencyId: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/statistics/execution-counts-by-source`,
+      `${API_URL}/agencies/${agencyId}/statistics/execution-counts-by-source/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -131,7 +131,7 @@ export const fetchGroupedByModelStatistics = async (agencyId: string) => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/grouped-by-model`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/grouped-by-model/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -154,7 +154,7 @@ export const fetchTopSnapchatAccounts = async (
 ) => {
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/statistics/accounts_with_score`,
+      `${API_URL}/agencies/${agencyId}/statistics/accounts_with_score/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -181,7 +181,7 @@ export const fetchDailyAccountStats = async (agencyId: string, days: number = 7)
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/daily-stats`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/daily-stats/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -204,7 +204,7 @@ export const fetchDailyChatbotRuns = async (agencyId: string) => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/daily-chatbot-runs`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/statistics/daily-chatbot-runs/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

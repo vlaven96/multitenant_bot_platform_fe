@@ -71,7 +71,7 @@ export const fetchAccounts = async (
     if (includeExecutions !== undefined)
       params.include_executions = includeExecutions;
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts`,
+      `${API_URL}/agencies/${agencyId}/accounts/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -105,7 +105,7 @@ export const addAccount = async (
   }
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/accounts`,
+      `${API_URL}/agencies/${agencyId}/accounts/`,
       {
         payload: {
           data: accountData.data,
@@ -138,7 +138,7 @@ export const terminateAccount = async (agencyId: string, accountId: string) => {
   }
   try {
     const response = await axios.patch(
-      `${API_URL}/agencies/${agencyId}/accounts/${accountId}`,
+      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/`,
       { status: "TERMINATED" },
       {
         headers: {
@@ -159,7 +159,7 @@ export const fetchAccountForEdit = async (agencyId: string, id: string) => {
   }
   try {
     const response = await fetch(
-      `${API_URL}/agencies/${agencyId}/accounts/${id}/edit`,
+      `${API_URL}/agencies/${agencyId}/accounts/${id}/edit/`,
       {
         method: "GET",
         headers: {
@@ -197,7 +197,7 @@ export const updateAccount = async (
   }
   try {
     const response = await axios.patch(
-      `${API_URL}/agencies/${agencyId}/accounts/${id}`,
+      `${API_URL}/agencies/${agencyId}/accounts/${id}/`,
       data,
       {
         headers: {
@@ -219,7 +219,7 @@ export const fetchAccountDetails = async (agencyId: string, id: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts/${id}`,
+      `${API_URL}/agencies/${agencyId}/accounts/${id}/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -239,7 +239,7 @@ export const fetchStatuses = async (agencyId: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts/statuses/list`,
+      `${API_URL}/agencies/${agencyId}/accounts/statuses/list/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -260,7 +260,7 @@ export const fetchTerminationCandidates = async (agencyId: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts/candidates-for-termination`,
+      `${API_URL}/agencies/${agencyId}/accounts/candidates-for-termination/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -284,7 +284,7 @@ export const terminateMultipleAccounts = async (
   }
   try {
     const response = await axios.patch(
-      `${API_URL}/agencies/${agencyId}/accounts/terminate`,
+      `${API_URL}/agencies/${agencyId}/accounts/terminate/`,
       accountIds,
       {
         headers: {
@@ -306,7 +306,7 @@ export const fetchSources = async (agencyId: string) => {
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts/sources/list`,
+      `${API_URL}/agencies/${agencyId}/accounts/sources/list/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -330,7 +330,7 @@ export const fetchAccountStatistics = async (
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/statistics`,
+      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/statistics/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -353,7 +353,7 @@ export const fetchAccountTimelineStatistics = async (
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/timeline-statistics`,
+      `${API_URL}/agencies/${agencyId}/accounts/${accountId}/timeline-statistics/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -387,7 +387,7 @@ export async function bulkUpdateAccounts(
   };
   // Adjust the API endpoint / method as needed
   const { data } = await axios.patch(
-    `${API_URL}/agencies/${agencyId}/accounts/bulk-update`,
+    `${API_URL}/agencies/${agencyId}/accounts/bulk-update/`,
     payload,
     { headers }
   );

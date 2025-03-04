@@ -15,7 +15,7 @@ export const fetchModels = async (agencyId: string): Promise<Model[]> => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/models`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/models/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -39,7 +39,7 @@ export const addModel = async (
     throw new Error("Agency ID is undefined");
   }
   try {
-    await axios.post(`${API_URL}/agencies/${agencyId}/models`, modelData, {
+    await axios.post(`${API_URL}/agencies/${agencyId}/models/`, modelData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -63,7 +63,7 @@ export const updateModel = async (
   }
   try {
     await axios.put(
-      `${API_URL}/agencies/${agencyId}/models/${model.id}`,
+      `${API_URL}/agencies/${agencyId}/models/${model.id}/`,
       { name: model.name, onlyfans_url: model.onlyfans_url },
       {
         headers: {
@@ -89,7 +89,7 @@ export const deleteModel = async (
     throw new Error("Agency ID is undefined");
   }
   try {
-    await axios.delete(`${API_URL}/agencies/${agencyId}/models/${modelId}`, {
+    await axios.delete(`${API_URL}/agencies/${agencyId}/models/${modelId}/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

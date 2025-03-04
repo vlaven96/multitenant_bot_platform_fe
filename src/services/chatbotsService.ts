@@ -58,7 +58,7 @@ export const addChatbot = async (agencyId: string, chatbotData: any): Promise<vo
 export const updateChatbot = async (agencyId: string, chatbot: Chatbot): Promise<void> => {
   try {
     await axios.put(
-      `${API_URL}/agencies/${agencyId}/chatbots/${chatbot.id}`,
+      `${API_URL}/agencies/${agencyId}/chatbots/${chatbot.id}/`,
       { type: chatbot.type, token: chatbot.token },
       {
         headers: {
@@ -81,7 +81,7 @@ export const deleteChatbot = async (agencyId: string, chatbotId: string): Promis
     throw new Error("Agency ID is undefined");
   }
   try {
-    await axios.delete(`${API_URL}/agencies/${agencyId}/chatbots/${chatbotId}`, {
+    await axios.delete(`${API_URL}/agencies/${agencyId}/chatbots/${chatbotId}/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },

@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL + "/auth";
 
 export const login = async (username: string, password: string) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, {
+    const response = await axios.post(`${API_URL}/login/`, {
       username,
       password,
     });
@@ -43,7 +43,7 @@ export const register = async (
   email: string,
   password: string
 ) => {
-  await axios.post(`${API_URL}/register`, { username, email, password });
+  await axios.post(`${API_URL}/register/`, { username, email, password });
 };
 
 export const logout = () => {
@@ -67,7 +67,7 @@ export const completeRegistration = async (
   userData: { username: string; password: string }
 ) => {
   try {
-    const response = await axios.post(`${API_URL}/complete-registration`, {
+    const response = await axios.post(`${API_URL}/complete-registration/`, {
       token,
       ...userData,
     });

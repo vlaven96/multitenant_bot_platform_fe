@@ -9,7 +9,7 @@ export const fetchTags = async (agencyId: string) => {
     throw new Error("Agency ID is undefined");
   }
   try {
-    const response = await axios.get(`${API_URL}/agencies/${agencyId}/tags`, {
+    const response = await axios.get(`${API_URL}/agencies/${agencyId}/tags/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
@@ -31,7 +31,7 @@ export const addTag = async (agencyId: string, tagName: string) => {
   }
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/tags`,
+      `${API_URL}/agencies/${agencyId}/tags/`,
       { name: tagName },
       {
         headers: {
@@ -53,7 +53,7 @@ export const deleteTag = async (agencyId: string, tagId: string) => {
   }
   try {
     const response = await axios.delete(
-      `${API_URL}/agencies/${agencyId}/tags/${tagId}`,
+      `${API_URL}/agencies/${agencyId}/tags/${tagId}/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,

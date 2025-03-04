@@ -61,7 +61,7 @@ export const updateWorkflow = async (
   }
   try {
     const response = await axios.put(
-      `${API_URL}/agencies/${agencyId}/workflows/${workflowId}`,
+      `${API_URL}/agencies/${agencyId}/workflows/${workflowId}/`,
       workflowData,
       {
         headers: {
@@ -153,7 +153,7 @@ export const fetchAssociatedAccounts = async (agencyId: string, workflowId: numb
   }
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/workflows/${workflowId}/accounts`,
+      `${API_URL}/agencies/${agencyId}/workflows/${workflowId}/accounts/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -186,7 +186,7 @@ export const addWorkflow = async (agencyId: string, workflowData: any) => {
   }
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/workflows`,
+      `${API_URL}/agencies/${agencyId}/workflows/`,  
       workflowData,
       {
         headers: {

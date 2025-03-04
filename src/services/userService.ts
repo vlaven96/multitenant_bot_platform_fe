@@ -19,7 +19,7 @@ export const fetchUsers = async (
     if (username) params.username = username;
 
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/admin/users`,
+      `${API_URL}/agencies/${agencyId}/admin/users/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -42,7 +42,7 @@ export const toggleUserActiveStatus = async (
   isActive: boolean
 ) => {
   return await axios.patch(
-    `${API_URL}/agencies/${agencyId}/users/${userId}`,
+    `${API_URL}/agencies/${agencyId}/users/${userId}/`,
     { is_active: !isActive },
     {
       headers: {
@@ -55,7 +55,7 @@ export const toggleUserActiveStatus = async (
 export const fetchUserDetails = async (agencyId: string, userId: string) => {
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/users/${userId}`
+      `${API_URL}/agencies/${agencyId}/users/${userId}/`
     );
     return response.data;
   } catch (error) {
@@ -67,7 +67,7 @@ export const fetchUserDetails = async (agencyId: string, userId: string) => {
 export const deleteUser = async (agencyId: string, userId: number) => {
   try {
     const response = await axios.delete(
-      `${API_URL}/agencies/${agencyId}/admin/users/${userId}`,
+      `${API_URL}/agencies/${agencyId}/admin/users/${userId}/`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -84,7 +84,7 @@ export const deleteUser = async (agencyId: string, userId: number) => {
 export const inviteUser = async (agencyId: string, email: string) => {
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/invite`,
+      `${API_URL}/agencies/${agencyId}/invite/`,
       { email },
       {
         headers: {

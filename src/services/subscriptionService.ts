@@ -11,7 +11,7 @@ const getAuthHeaders = () => ({
 export const fetchSubscription = async (agencyId: string) => {
   try {
     const response = await axios.get(
-      `${API_URL}/agencies/${agencyId}/subscriptions`,
+      `${API_URL}/agencies/${agencyId}/subscriptions/`,
       getAuthHeaders()
     );
     return response.data;
@@ -27,7 +27,7 @@ export const createSubscription = async (
 ) => {
   try {
     const response = await axios.post(
-      `${API_URL}/agencies/${agencyId}/subscriptions`,
+      `${API_URL}/agencies/${agencyId}/subscriptions/`,
       {
         days_available: parseInt(data.daysAvailable, 10),
         number_of_sloths: parseInt(data.numberOfSloths, 10),
@@ -48,7 +48,7 @@ export const updateSubscription = async (
 ) => {
   try {
     const response = await axios.put(
-      `${API_URL}/agencies/${agencyId}/subscriptions`,
+      `${API_URL}/agencies/${agencyId}/subscriptions/`,
       {
         number_of_sloths: parseInt(data.numberOfSloths, 10),
         status: data.status,
@@ -69,7 +69,7 @@ export const renewSubscription = async (
 ) => {
   try {
     const response = await axios.put(
-      `${API_URL}/agencies/${agencyId}/subscriptions/renew`,
+      `${API_URL}/agencies/${agencyId}/subscriptions/renew/`,
       {
         days_available: parseInt(data.daysAvailable, 10),
         number_of_sloths: parseInt(data.numberOfSloths, 10),
