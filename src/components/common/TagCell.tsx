@@ -63,6 +63,11 @@ const TagCell: React.FC<TagCellProps> = ({ row, existingTags, onTagsUpdate }) =>
         onClose={() => setDialogOpen(false)}
         fullWidth
         maxWidth="sm"
+        sx={{
+          '& .MuiDialog-paper': {
+            minHeight: '30vh',  // at least 70% of the viewport height
+          },
+        }}
       >
         <DialogTitle>Edit Tags</DialogTitle>
         <DialogContent>
@@ -88,6 +93,11 @@ const TagCell: React.FC<TagCellProps> = ({ row, existingTags, onTagsUpdate }) =>
                   minWidth: '300px',
                   fontSize: '1em',
                   padding: '8px',
+                  borderColor: '#ced4da',
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#80bdff',
+                  },
                 }),
                 multiValue: (base) => ({
                   ...base,
