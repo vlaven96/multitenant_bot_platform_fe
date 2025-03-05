@@ -1,1 +1,17 @@
 
+/* file: src/index.css (or App.css, etc.) */
+
+/* Define your two main colors as CSS variables on :root */
+:root {
+    --main-color-1: #121d27;  /* A dark bluish shade */
+    --main-color-2: #caffff;  /* A light cyan color */
+    --main-color-3: #56ebf9;  /* A light cyan color */
+    --main-color-4: #19798c;  /* A light cyan color */
+  }
+  
+  /* Optional: Set global body background or text color */
+  body {
+    background-color: var(--main-color-1);
+    color: var(--main-color-1);
+  }
+  

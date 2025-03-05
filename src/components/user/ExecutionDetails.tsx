@@ -5,6 +5,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ExecutionDetails.css';
 import { fetchExecutionDetails } from '../../services/executionService';
 
+// Keep Bootstrap for your table classes
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+// MUI imports for layout & styling
+import { Box, Typography, Button } from '@mui/material';
+
 interface AccountExecution {
   id: number;
   type: string;
@@ -49,6 +55,7 @@ const ExecutionDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { agencyId } = useParams<{ agencyId: string }>();
   const navigate = useNavigate();
+
   const [execution, setExecution] = useState<Execution | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -70,73 +77,93 @@ const ExecutionDetails: React.FC = () => {
     };
 
     loadExecutionDetails();
-  }, [id]);
+  }, [agencyId, id]);
 
   const getStatusClass = (status: string) => {
     switch (status) {
       case 'FAILURE':
-        return 'status-failure';
+        return 'status-failure'; // defined in your .css for red styling
       case 'DONE':
-        return 'status-success';
+        return 'status-success'; // green
       default:
-        return 'status-pending';
+        return 'status-pending'; // yellow or pending
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Box p={2}>Loading...</Box>;
   }
 
   if (!execution) {
-    return <div>Execution not found</div>;
+    return <Box p={2}>Execution not found</Box>;
   }
 
   return (
-    <div className="execution-details-container">
-      <div className="header">
-        <button onClick={() => navigate(`/agency/${agencyId}/executions`)} className="btn btn-secondary">
+    <Box className="execution-details-container" sx={{ p: 2 }}>
+      <Box
+        className="header"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          mb: 2
+        }}
+      >
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => navigate(`/agency/${agencyId}/executions`)}
+        >
           Back to Executions
-        </button>
-        <h2>Execution Details #{execution.id}</h2>
-      </div>
+        </Button>
+        <Typography variant="h5">
+          Execution Details #{execution.id}
+        </Typography>
+      </Box>
 
-      <div className="main-execution-details">
-        <h3>Main Execution</h3>
-        <div className="details-grid">
-          <div className="detail-item">
+      <Box className="main-execution-details" sx={{ mb: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Main Execution
+        </Typography>
+        <Box className="details-grid" sx={{ display: 'grid', gridTemplateColumns: 'auto auto', gap: 2 }}>
+          <Box className="detail-item">
             <span className="label">Type:</span>
             <span className="value">{execution.type}</span>
-          </div>
-          <div className="detail-item">
+          </Box>
+          <Box className="detail-item">
             <span className="label">Status:</span>
             <span className={`value ${getStatusClass(execution.status)}`}>
               {execution.status}
             </span>
-          </div>
-          <div className="detail-item">
+          </Box>
+          <Box className="detail-item">
             <span className="label">Start Time:</span>
             <span className="value">{new Date(execution.start_time).toLocaleString()}</span>
-          </div>
-          <div className="detail-item">
+          </Box>
+          <Box className="detail-item">
             <span className="label">End Time:</span>
             <span className="value">{new Date(execution.end_time).toLocaleString()}</span>
-          </div>
-          <div className="detail-item">
+          </Box>
+          <Box className="detail-item">
             <span className="label">Triggered By:</span>
             <span className="value">{execution.triggered_by}</span>
-          </div>
-          {/* <div className="detail-item">
+          </Box>
+          {/* If you want to show configuration:
+          <Box className="detail-item">
             <span className="label">Configuration:</span>
             <pre className="value parameters">
               {JSON.stringify(execution.configuration, null, 2)}
             </pre>
-          </div> */}
-        </div>
-      </div>
+          </Box>
+          */}
+        </Box>
+      </Box>
 
-      <div className="account-executions">
-        <h3>Account Executions</h3>
-        <div className="table-responsive">
+      <Box className="account-executions">
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Account Executions
+        </Typography>
+        <Box className="table-responsive">
           <table className="table">
             <thead>
               <tr>
@@ -174,7 +201,9 @@ const ExecutionDetails: React.FC = () => {
                   <td>
                     <span
                       className="clickable-cell"
-                      onClick={() => window.open(`/snapchat-account/${accountExec.snap_account_id}`, '_blank')}
+                      onClick={() =>
+                        window.open(`/snapchat-account/${accountExec.snap_account_id}`, '_blank')
+                      }
                     >
                       {accountExec.snapchat_account_username || 'N/A'}
                     </span>
@@ -185,27 +214,49 @@ const ExecutionDetails: React.FC = () => {
                     </span>
                   </td>
                   <td>{new Date(accountExec.start_time).toLocaleString()}</td>
-                  <td>{accountExec.end_time ? new Date(accountExec.end_time).toLocaleString() : '-'}</td>
+                  <td>
+                    {accountExec.end_time
+                      ? new Date(accountExec.end_time).toLocaleString()
+                      : '-'}
+                  </td>
                   {execution.type === 'QUICK_ADDS' && (
                     <>
-                      <td>{accountExec.result ? accountExec.result.total_sent_requests ?? 'N/A' : 'N/A'}</td>
-                      <td>{accountExec.result ? accountExec.result.rejected_count ?? 'N/A' : 'N/A'}</td>
-                      <td>{accountExec.result ? accountExec.result.quick_add_pages_requested ?? 'N/A' : 'N/A'}</td>
                       <td>
-                        {accountExec.result && typeof accountExec.result === 'object' && 'added_users' in accountExec.result && Array.isArray((accountExec.result as AccountExecutionResult).added_users) && (accountExec.result as AccountExecutionResult).added_users!.length > 0 ? (
-                          (accountExec.result as AccountExecutionResult).added_users!.map((username: string, index: number) => (
-                            <React.Fragment key={index}>
-                              <a
-                                href={`https://www.snapchat.com/add/${username}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="clickable-cell"
-                              >
-                                {username}
-                              </a>
-                              {index < (accountExec.result as AccountExecutionResult).added_users!.length - 1 ? ', ' : ''}
-                            </React.Fragment>
-                          ))
+                        {accountExec.result
+                          ? accountExec.result.total_sent_requests ?? 'N/A'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {accountExec.result
+                          ? accountExec.result.rejected_count ?? 'N/A'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {accountExec.result
+                          ? accountExec.result.quick_add_pages_requested ?? 'N/A'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {accountExec.result &&
+                        typeof accountExec.result === 'object' &&
+                        'added_users' in accountExec.result &&
+                        Array.isArray(accountExec.result.added_users) &&
+                        accountExec.result.added_users.length > 0 ? (
+                          accountExec.result.added_users.map(
+                            (username: string, index: number) => (
+                              <React.Fragment key={index}>
+                                <a
+                                  href={`https://www.snapchat.com/add/${username}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="clickable-cell"
+                                >
+                                  {username}
+                                </a>
+                                {index < accountExec.result.added_users.length - 1 ? ', ' : ''}
+                              </React.Fragment>
+                            )
+                          )
                         ) : (
                           'N/A'
                         )}
@@ -214,10 +265,18 @@ const ExecutionDetails: React.FC = () => {
                   )}
                   {execution.type === 'CHECK_CONVERSATIONS' && (
                     <>
-                      <td>{accountExec.result ? accountExec.result.conversations ?? 'N/A' : 'N/A'}</td>
                       <td>
-                        {accountExec.result && accountExec.result.latest_events && accountExec.result.latest_events.length > 0 ? (
-                          <span className="badge bg-secondary me-1">{accountExec.result.latest_events[0]}</span>
+                        {accountExec.result
+                          ? accountExec.result.conversations ?? 'N/A'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {accountExec.result &&
+                        accountExec.result.latest_events &&
+                        accountExec.result.latest_events.length > 0 ? (
+                          <span className="badge bg-secondary me-1">
+                            {accountExec.result.latest_events[0]}
+                          </span>
                         ) : (
                           'N/A'
                         )}
@@ -226,11 +285,23 @@ const ExecutionDetails: React.FC = () => {
                   )}
                   {execution.type === 'GENERATE_LEADS' && (
                     <>
-                      <td>{accountExec.result ? accountExec.result.generated_leads ?? 'N/A' : 'N/A'}</td>
-                      <td>{accountExec.result ? accountExec.result.quick_add_pages_requested ?? 'N/A' : 'N/A'}</td>
                       <td>
-                        {accountExec.result && typeof accountExec.result === 'object' && 'added_users' in accountExec.result && Array.isArray((accountExec.result as AccountExecutionResult).added_users) && (accountExec.result as AccountExecutionResult).added_users!.length > 0 ? (
-                          (accountExec.result as AccountExecutionResult).added_users!.map((username: string, index: number) => (
+                        {accountExec.result
+                          ? accountExec.result.generated_leads ?? 'N/A'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {accountExec.result
+                          ? accountExec.result.quick_add_pages_requested ?? 'N/A'
+                          : 'N/A'}
+                      </td>
+                      <td>
+                        {accountExec.result &&
+                        typeof accountExec.result === 'object' &&
+                        'added_users' in accountExec.result &&
+                        Array.isArray(accountExec.result.added_users) &&
+                        accountExec.result.added_users.length > 0 ? (
+                          accountExec.result.added_users.map((username: string, index: number) => (
                             <React.Fragment key={index}>
                               <a
                                 href={`https://www.snapchat.com/add/${username}`}
@@ -240,7 +311,7 @@ const ExecutionDetails: React.FC = () => {
                               >
                                 {username}
                               </a>
-                              {index < (accountExec.result as AccountExecutionResult).added_users!.length - 1 ? ', ' : ''}
+                              {index < accountExec.result.added_users.length - 1 ? ', ' : ''}
                             </React.Fragment>
                           ))
                         ) : (
@@ -254,11 +325,11 @@ const ExecutionDetails: React.FC = () => {
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
+        </Box>
+      </Box>
       <ToastContainer />
-    </div>
+    </Box>
   );
 };
 
-export default ExecutionDetails; 
+export default ExecutionDetails;

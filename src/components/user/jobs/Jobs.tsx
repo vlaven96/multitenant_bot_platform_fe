@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { fetchJobs, createJob, deleteJob, updateJobStatus, updateJob, fetchAssociatedUsernames } from '../../../services/jobService';
+import {
+  fetchJobs,
+  createJob,
+  deleteJob,
+  updateJob,
+  updateJobStatus,
+  fetchAssociatedUsernames
+} from '../../../services/jobService';
 import { fetchTags } from '../../../services/tagsService';
 import { fetchStatuses, fetchSources } from '../../../services/accountsService';
+
 import Select, { MultiValue, SingleValue } from 'react-select';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 import { toast } from 'react-toastify';
-import { Modal, Button, OverlayTrigger, Popover } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import {
+  Modal,
+  Button as RBButton,  // Distinguish React-Bootstrap's <Button> as RBButton
+  OverlayTrigger,
+  Popover
+} from 'react-bootstrap'; // Keeping React-Bootstrap for modals, popovers
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useParams } from 'react-router-dom';
+
+// Keep the bootstrap import if you still need React-Bootstrap styling for modals, popovers, etc.
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+import { useNavigate, useParams } from 'react-router-dom';
+import { Box, Typography, Button, Grid } from '@mui/material'; // MUI for layout & styling
 
 interface SelectOption {
   value: string;
@@ -31,13 +48,18 @@ interface Job {
 const Jobs: React.FC = () => {
   const navigate = useNavigate();
   const { agencyId } = useParams<{ agencyId: string }>();
+
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [showForm, setShowForm] = useState(false);
-  const [tagsOptions, setTagsOptions] = useState<SelectOption[]>([]);
-  const [statusesOptions, setStatusesOptions] = useState<SelectOption[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingJobId, setEditingJobId] = useState<number | null>(null);
+
+  const [tagsOptions, setTagsOptions] = useState<SelectOption[]>([]);
+  const [statusesOptions, setStatusesOptions] = useState<SelectOption[]>([]);
+  const [sourcesOptions, setSourcesOptions] = useState<SelectOption[]>([]);
+
   const [newJob, setNewJob] = useState<Job>({
     name: '',
     statuses: [],
@@ -48,6 +70,8 @@ const Jobs: React.FC = () => {
     configuration: {},
     status: 'ACTIVE',
   });
+
+  // Additional job config states
   const [startingDelay, setStartingDelay] = useState<number | string>(30);
   const [requests, setRequests] = useState<number | string>(20);
   const [batches, setBatches] = useState<number | string>(1);
@@ -56,22 +80,28 @@ const Jobs: React.FC = () => {
   const [username, setUsername] = useState('');
   const [usersSentInRequest, setUsersSentInRequest] = useState<number | string>(1);
   const [argoTokens, setArgoTokens] = useState<boolean>(true);
-  const [showModal, setShowModal] = useState(false);
+
   const [firstExecutionOption, setFirstExecutionOption] = useState('none');
   const [firstExecutionTime, setFirstExecutionTime] = useState('');
-  const [sourcesOptions, setSourcesOptions] = useState<SelectOption[]>([]);
+
   const [accountsNumber, setAccountsNumber] = useState<number | string>(5);
   const [targetLeadNumber, setTargetLeadNumber] = useState<number | string>(30);
   const [weightRejectingRate, setWeightRejectingRate] = useState<number | string>(0.6);
   const [weightConversationRate, setWeightConversationRate] = useState<number | string>(0.4);
   const [weightConversionRate, setWeightConversionRate] = useState<number | string>(0);
+  const [weightError, setWeightError] = useState('');
+
+  // React-Bootstrap modals
+  const [showModal, setShowModal] = useState(false);
+
+  // Associated usernames
   const [showUsernamesModal, setShowUsernamesModal] = useState(false);
-  const [associatedUsernames, setAssociatedUsernames] = useState<{ username: string, id: number }[]>([]);
+  const [associatedUsernames, setAssociatedUsernames] = useState<{ username: string; id: number }[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
 
+  // Job Type options
   const typeOptions = [
     { value: 'quick_adds', label: 'Quick Adds' },
-    // { value: 'consume_leads', label: 'Consume Leads' },
     { value: 'send_to_user', label: 'Send to User' },
     { value: 'check_conversations', label: 'Check Conversations' },
     { value: 'status_check', label: 'Check Status' },
@@ -80,17 +110,18 @@ const Jobs: React.FC = () => {
     // { value: 'quick_adds_top_accounts', label: 'Quick Adds Top Accounts' }
   ];
 
+  /***** Input Handlers *****/
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewJob({ ...newJob, [name]: value });
   };
 
   const handleTagsChange = (selectedOptions: MultiValue<SelectOption>) => {
-    setNewJob({ ...newJob, tags: selectedOptions.map(option => option.value) });
+    setNewJob({ ...newJob, tags: selectedOptions.map((option) => option.value) });
   };
 
   const handleStatusesChange = (selectedOptions: MultiValue<SelectOption>) => {
-    setNewJob({ ...newJob, statuses: selectedOptions.map(option => option.value) });
+    setNewJob({ ...newJob, statuses: selectedOptions.map((option) => option.value) });
   };
 
   const handleTypeChange = (selectedOption: SingleValue<SelectOption>) => {
@@ -98,20 +129,24 @@ const Jobs: React.FC = () => {
   };
 
   const handleSourcesChange = (selectedOptions: MultiValue<SelectOption>) => {
-    setNewJob({ ...newJob, sources: selectedOptions.map(option => option.value) });
+    setNewJob({ ...newJob, sources: selectedOptions.map((option) => option.value) });
   };
 
+  /***** Form Validation *****/
   const validateForm = () => {
     if (!newJob.name.trim()) {
       toast.error('Job name is required');
       return false;
     }
-
-    if (newJob.type !== 'generate_leads' && newJob.statuses.length === 0 && (!newJob.tags || newJob.tags.length === 0) && (!newJob.sources || newJob.sources.length === 0)) {
+    if (
+      newJob.type !== 'generate_leads' &&
+      newJob.statuses.length === 0 &&
+      (!newJob.tags || newJob.tags.length === 0) &&
+      (!newJob.sources || newJob.sources.length === 0)
+    ) {
       toast.error('At least one status, tag, or source must be selected');
       return false;
     }
-
     if (!newJob.type) {
       toast.error('Job type is required');
       return false;
@@ -120,13 +155,11 @@ const Jobs: React.FC = () => {
       toast.error('Cron expression is required');
       return false;
     }
-
     if (firstExecutionOption === 'datetime' && !firstExecutionTime) {
-      toast.error('Please select a date and time for the first execution');
+      toast.error('Please select a date/time for the first execution');
       return false;
     }
-
-    // Validate configuration based on type
+    // Additional checks based on type
     if (newJob.type === 'quick_adds') {
       if (!startingDelay || !requests || !batches || !batchDelay || !quickAddPages || !usersSentInRequest) {
         toast.error('All configuration fields are required for Quick Adds');
@@ -142,10 +175,7 @@ const Jobs: React.FC = () => {
         toast.error('Starting delay is required');
         return false;
       }
-    } else if (newJob.type === 'compute_statistics') {
-      return true;
     }
-
     return true;
   };
 
@@ -177,6 +207,8 @@ const Jobs: React.FC = () => {
         };
       case 'check_conversations':
       case 'status_check':
+      case 'set_bitmoji':
+      case 'change_bitmoji':
         return {
           starting_delay: Number(startingDelay)
         };
@@ -208,10 +240,12 @@ const Jobs: React.FC = () => {
     }
   };
 
+  /***** Modal Helpers *****/
   const handleClose = () => {
     setShowModal(false);
     setIsEditing(false);
     setEditingJobId(null);
+
     // Reset form
     setNewJob({
       name: '',
@@ -255,26 +289,22 @@ const Jobs: React.FC = () => {
       status: job.status,
     });
 
-    // Set configuration values based on job type
-    const config = job.configuration;
-    if (config) {
-      setStartingDelay(config.starting_delay || 30);
-      if (job.type === 'QUICK_ADDS') {
-        setRequests(config.requests || 20);
-        setBatches(config.batches || 1);
-        setBatchDelay(config.batch_delay || 10);
-        setQuickAddPages(config.max_quick_add_pages || 10);
-        setUsersSentInRequest(config.users_sent_in_request || 1);
-        setArgoTokens(config.argo_tokens !== undefined ? config.argo_tokens : true);
-      } else if (job.type === 'SEND_TO_USER') {
-        setUsername(config.username || '');
-      }
+    const config = job.configuration || {};
+    setStartingDelay(config.starting_delay ?? 30);
+
+    if (job.type === 'QUICK_ADDS') {
+      setRequests(config.requests ?? 20);
+      setBatches(config.batches ?? 1);
+      setBatchDelay(config.batch_delay ?? 10);
+      setQuickAddPages(config.max_quick_add_pages ?? 10);
+      setUsersSentInRequest(config.users_sent_in_request ?? 1);
+      setArgoTokens(config.argo_tokens !== undefined ? config.argo_tokens : true);
+    } else if (job.type === 'SEND_TO_USER') {
+      setUsername(config.username || '');
     }
 
-    // Handle start date
     if (job.start_date) {
       setFirstExecutionOption('datetime');
-      // Convert UTC date to local datetime-local format
       const date = new Date(job.start_date);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -304,38 +334,31 @@ const Jobs: React.FC = () => {
       status: 'ACTIVE',
     });
 
-    // Set configuration values based on job type
-    const config = job.configuration;
-    if (config) {
-      setStartingDelay(config.starting_delay || 30);
-      if (job.type === 'QUICK_ADDS') {
-        setRequests(config.requests || 20);
-        setBatches(config.batches || 1);
-        setBatchDelay(config.batch_delay || 10);
-        setQuickAddPages(config.max_quick_add_pages || 10);
-        setUsersSentInRequest(config.users_sent_in_request || 1);
-        setArgoTokens(config.argo_tokens !== undefined ? config.argo_tokens : true);
-      } else if (job.type === 'SEND_TO_USER') {
-        setUsername(config.username || '');
-      }
+    const config = job.configuration || {};
+    setStartingDelay(config.starting_delay ?? 30);
+
+    if (job.type === 'QUICK_ADDS') {
+      setRequests(config.requests ?? 20);
+      setBatches(config.batches ?? 1);
+      setBatchDelay(config.batch_delay ?? 10);
+      setQuickAddPages(config.max_quick_add_pages ?? 10);
+      setUsersSentInRequest(config.users_sent_in_request ?? 1);
+      setArgoTokens(config.argo_tokens !== undefined ? config.argo_tokens : true);
+    } else if (job.type === 'SEND_TO_USER') {
+      setUsername(config.username || '');
     }
 
-    // For copied jobs, default to no specific start time
     setFirstExecutionOption('none');
     setFirstExecutionTime('');
-
     setShowModal(true);
   };
 
   const handleCreateOrUpdateJob = async () => {
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       let firstExecutionTimeUTC = null;
       if (firstExecutionOption === 'datetime' && firstExecutionTime) {
-        // Convert local datetime to UTC
         const localDate = new Date(firstExecutionTime);
         firstExecutionTimeUTC = localDate.toISOString();
       } else if (firstExecutionOption === 'now') {
@@ -365,13 +388,8 @@ const Jobs: React.FC = () => {
         await createJob(agencyId, jobData);
         toast.success('Job created successfully');
       }
-      
+
       handleClose();
-      // Refresh jobs list  
-      if (!agencyId) {
-        console.error('Agency ID is undefined');
-        return;
-      }
       const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
       setJobs(data);
     } catch (error: any) {
@@ -390,7 +408,6 @@ const Jobs: React.FC = () => {
         }
         await deleteJob(agencyId, jobId);
         toast.success('Job deleted successfully');
-        // Refresh jobs list
         const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
         setJobs(data);
       } catch (error) {
@@ -409,11 +426,6 @@ const Jobs: React.FC = () => {
       const newStatus = currentStatus === 'ACTIVE' ? 'STOPPED' : 'ACTIVE';
       await updateJobStatus(agencyId, jobId, newStatus);
       toast.success('Job status updated successfully');
-      // Refresh jobs list
-      if (!agencyId) {
-        console.error('Agency ID is undefined');
-        return;
-      }
       const data = await fetchJobs(agencyId, ['ACTIVE', 'STOPPED']);
       setJobs(data);
     } catch (error) {
@@ -423,7 +435,6 @@ const Jobs: React.FC = () => {
   };
 
   const handleViewExecutions = (jobId: number) => {
-    // Open in new tab with job pre-selected
     window.open(`/agency/${agencyId}/executions?job=${jobId}`, '_blank');
   };
 
@@ -435,6 +446,7 @@ const Jobs: React.FC = () => {
       }
       const accounts = await fetchAssociatedUsernames(agencyId, jobId);
       setAssociatedUsernames(accounts);
+      setSelectedJobId(jobId);
       setShowUsernamesModal(true);
     } catch (error) {
       console.error('Failed to fetch associated usernames:', error);
@@ -442,254 +454,89 @@ const Jobs: React.FC = () => {
     }
   };
 
-  const renderConfigurationOptions = () => {
+  // Render job-type-specific fields
+  const renderConfigurationOptions = (): JSX.Element | null => {
     switch (newJob.type) {
       case 'quick_adds':
         return (
           <div>
-            {/* <div className="form-group mb-2">
-              <label>Starting Delay (seconds)</label>
-              <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div> */}
-            <div className="form-group mb-2">
+            <div className="mb-2">
               <label>Number of Quick Adds to Send</label>
-              <input type="number" value={requests} onChange={(e) => setRequests(e.target.value)} className="form-control" />
-            </div>
-            {/* <div className="form-group mb-2">
-              <label>Batches</label>
-              <input type="number" value={batches} onChange={(e) => setBatches(e.target.value)} className="form-control" />
-            </div> */}
-            {/* <div className="form-group mb-2">
-              <label>Batch Delay (seconds)</label>
-              <input type="number" value={batchDelay} onChange={(e) => setBatchDelay(e.target.value)} className="form-control" />
-            </div> */}
-            {/* <div className="form-group mb-2">
-              <label>Quick Add Pages</label>
-              <input type="number" value={quickAddPages} onChange={(e) => setQuickAddPages(e.target.value)} className="form-control" />
-            </div> */}
-            {/* <div className="form-group mb-2">
-              <label>Users Sent in Request</label>
               <input
                 type="number"
-                value={usersSentInRequest}
-                onChange={(e) => setUsersSentInRequest(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                value={requests}
+                onChange={(e) => setRequests(e.target.value)}
                 className="form-control"
-                min="0"
               />
-            </div> */}
-            {/* <div className="form-check mb-2">
-              <input type="checkbox" className="form-check-input" checked={argoTokens} onChange={(e) => setArgoTokens(e.target.checked)} />
-              <label className="form-check-label">Use Argo Tokens</label>
-            </div> */}
+            </div>
           </div>
         );
-      // case 'consume_leads':
-      //   return (
-      //     <div>
-      //       <div className="form-group mb-2">
-      //         <label>Starting Delay (seconds)</label>
-      //         <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-      //       </div>
-      //       <div className="form-group mb-2">
-      //         <label>Requests</label>
-      //         <input type="number" value={requests} onChange={(e) => setRequests(e.target.value)} className="form-control" />
-      //       </div>
-      //       <div className="form-group mb-2">
-      //         <label>Batches</label>
-      //         <input type="number" value={batches} onChange={(e) => setBatches(e.target.value)} className="form-control" />
-      //       </div>
-      //       <div className="form-group mb-2">
-      //         <label>Batch Delay (seconds)</label>
-      //         <input type="number" value={batchDelay} onChange={(e) => setBatchDelay(e.target.value)} className="form-control" />
-      //       </div>
-      //       <div className="form-group mb-2">
-      //         <label>Users Sent in Request</label>
-      //         <input
-      //           type="number"
-      //           value={usersSentInRequest}
-      //           onChange={(e) => setUsersSentInRequest(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
-      //           className="form-control"
-      //           min="0"
-      //         />
-      //       </div>
-      //       <div className="form-check mb-2">
-      //         <input type="checkbox" className="form-check-input" checked={argoTokens} onChange={(e) => setArgoTokens(e.target.checked)} />
-      //         <label className="form-check-label">Use Argo Tokens</label>
-      //       </div>
-      //     </div>
-      //   );
       case 'send_to_user':
         return (
           <div>
-            {/* <div className="form-group mb-2">
-              <label>Starting Delay (seconds)</label>
-              <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div> */}
-            <div className="form-group mb-2">
+            <div className="mb-2">
               <label>Username</label>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" />
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="form-control"
+              />
             </div>
           </div>
         );
-      // case 'check_conversations':
-      // case 'status_check':
-      //   return (
-      //     <div>
-      //       <div className="form-group mb-2">
-      //         <label>Starting Delay (seconds)</label>
-      //         <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-      //       </div>
-      //     </div>
-      //   );
-      // case 'compute_statistics':
-      //   return (
-      //     <div className="text-muted">
-      //       No configuration needed for statistics computation.
-      //     </div>
-      //   );
       case 'generate_leads':
         return (
-          <div className="generate-leads-container">
-            <div className="mb-2 flex-item">
+          <div>
+            <div className="mb-2">
               <label>Accounts Number:</label>
               <input
                 type="number"
                 value={accountsNumber}
-                onChange={(e) => setAccountsNumber(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
-                placeholder="Accounts Number"
+                onChange={(e) => setAccountsNumber(e.target.value)}
                 className="form-control"
-                min="0"
               />
             </div>
-            <div className="mb-2 flex-item">
+            <div className="mb-2">
               <label>Target Lead Number:</label>
               <input
                 type="number"
                 value={targetLeadNumber}
-                onChange={(e) => setTargetLeadNumber(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
-                placeholder="Target Lead Number"
+                onChange={(e) => setTargetLeadNumber(e.target.value)}
                 className="form-control"
-                min="0"
               />
             </div>
-            <div className="mb-2 flex-item">
+            <div className="mb-2">
               <label>Weight Rejecting Rate:</label>
               <input
                 type="number"
                 value={weightRejectingRate}
-                onChange={(e) => setWeightRejectingRate(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
+                onChange={(e) => setWeightRejectingRate(e.target.value)}
                 className="form-control"
-                min="0"
-                max="1"
-                step="0.01"
               />
             </div>
-            <div className="mb-2 flex-item">
+            <div className="mb-2">
               <label>Weight Conversation Rate:</label>
               <input
                 type="number"
                 value={weightConversationRate}
-                onChange={(e) => setWeightConversationRate(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
+                onChange={(e) => setWeightConversationRate(e.target.value)}
                 className="form-control"
-                min="0"
-                max="1"
-                step="0.01"
               />
             </div>
-            <div className="mb-2 flex-item">
+            <div className="mb-2">
               <label>Weight Conversion Rate:</label>
               <input
                 type="number"
                 value={weightConversionRate}
-                onChange={(e) => setWeightConversionRate(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
+                onChange={(e) => setWeightConversionRate(e.target.value)}
                 className="form-control"
-                min="0"
-                max="1"
-                step="0.01"
               />
             </div>
+            {weightError && <div className="alert alert-danger">{weightError}</div>}
           </div>
         );
-      case 'quick_adds_top_accounts':
-        return (
-          <div>
-            <div className="form-group mb-2">
-              <label>Starting Delay (seconds)</label>
-              <input type="number" value={startingDelay} onChange={(e) => setStartingDelay(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Requests</label>
-              <input type="number" value={requests} onChange={(e) => setRequests(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Batches</label>
-              <input type="number" value={batches} onChange={(e) => setBatches(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Batch Delay (seconds)</label>
-              <input type="number" value={batchDelay} onChange={(e) => setBatchDelay(e.target.value)} className="form-control" />
-            </div>
-            <div className="form-group mb-2">
-              <label>Quick Add Pages</label>
-              <input
-                type="number"
-                value={quickAddPages}
-                onChange={(e) => setQuickAddPages(e.target.value)}
-                className="form-control"
-              />
-            </div>
-            <div className="form-group mb-2">
-              <label>Users Sent in Request</label>
-              <input
-                type="number"
-                value={usersSentInRequest}
-                onChange={(e) => setUsersSentInRequest(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
-                className="form-control"
-                min="0"
-              />
-            </div>
-            <div className="form-check mb-2">
-              <input type="checkbox" className="form-check-input" checked={argoTokens} onChange={(e) => setArgoTokens(e.target.checked)} />
-              <label className="form-check-label">Use Argo Tokens</label>
-            </div>
-            <div className="form-group mb-2">
-              <label>Max Rejection Rate</label>
-              <input
-                type="number"
-                value={weightRejectingRate}
-                onChange={(e) => setWeightRejectingRate(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
-                className="form-control"
-                min="0"
-                max="1"
-                step="0.01"
-              />
-            </div>
-            <div className="form-group mb-2">
-              <label>Min Conversation Rate</label>
-              <input
-                type="number"
-                value={weightConversationRate}
-                onChange={(e) => setWeightConversationRate(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
-                className="form-control"
-                min="0"
-                max="1"
-                step="0.01"
-              />
-            </div>
-            <div className="form-group mb-2">
-              <label>Min Conversion Rate</label>
-              <input
-                type="number"
-                value={weightConversionRate}
-                onChange={(e) => setWeightConversionRate(e.target.value === '' ? '' : Math.max(0, Math.min(1, parseFloat(e.target.value))))}
-                className="form-control"
-                min="0"
-                max="1"
-                step="0.01"
-              />
-            </div>
-          </div>
-        );
+      // More cases if needed...
       default:
         return null;
     }
@@ -745,10 +592,9 @@ const Jobs: React.FC = () => {
           return;
         }
         const sources = await fetchSources(agencyId);
-        setSourcesOptions(sources.map((source: string) => ({
-          value: source,
-          label: source
-        })));
+        setSourcesOptions(
+          sources.map((source: string) => ({ value: source, label: source }))
+        );
       } catch (error) {
         console.error('Failed to load sources:', error);
         toast.error('Failed to load sources');
@@ -761,185 +607,292 @@ const Jobs: React.FC = () => {
     loadSources();
   }, []);
 
-  const configurationOptions = renderConfigurationOptions();
-
   return (
-    <div className="container-fluid p-4">
+    <Box sx={{ minHeight: '100vh', p: 4 }}>
       <ToastContainer />
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Jobs</h1>
-        <Button variant="primary" onClick={handleShow}>
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 4,
+        }}
+      >
+        <Typography variant="h4">Jobs</Typography>
+        <Button variant="contained" color="primary" onClick={handleShow}>
           Create New Job
         </Button>
-      </div>
+      </Box>
 
       {loading ? (
-        <div className="text-center">
+        <Box sx={{ textAlign: 'center', mt: 2 }}>
           <div className="spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
-        </div>
+        </Box>
       ) : jobs.length === 0 ? (
-        <div className="alert alert-info">No jobs available.</div>
+        <Box sx={{ border: '1px solid #ccc', p: 2 }}>
+          <Typography variant="body1" color="text.secondary">
+            No jobs available.
+          </Typography>
+        </Box>
       ) : (
-        <div className="row">
+        <Grid container spacing={2}>
           {jobs.map((job) => (
-            <div key={job.id} className="col-md-6 col-lg-4 mb-4">
-              <div className="card h-100">
-                <div className="card-body d-flex flex-column">
-                  <div className="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
-                    <h5 className="card-title mb-0">{job.name}</h5>
-                    <div className="d-flex gap-2 flex-wrap">
-                      <button 
-                        className={`btn btn-sm ${job.status === 'ACTIVE' ? 'btn-warning' : 'btn-success'}`}
-                        onClick={() => handleStatusUpdate(job.id, job.status)}
-                      >
-                        {job.status === 'ACTIVE' ? 'Stop' : 'Activate'}
-                      </button>
-                      <button 
-                        className="btn btn-info btn-sm"
-                        onClick={() => handleViewExecutions(job.id)}
-                        title="View Executions"
-                      >
-                        <i className="bi bi-eye-fill"></i>
-                      </button>
-                      <button 
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleEdit(job)}
-                        title="Edit Job"
-                      >
-                        <i className="bi bi-pencil-fill"></i>
-                      </button>
-                      <button 
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => handleCopy(job)}
-                        title="Copy Job"
-                      >
-                        <i className="bi bi-files"></i>
-                      </button>
-                      <button 
-                        className="btn btn-danger btn-sm" 
-                        onClick={() => handleDeleteJob(job.id)}
-                        title="Delete Job"
-                      >
-                        <i className="bi bi-trash3-fill"></i>
-                      </button>
-                      <button 
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => {
-                          setSelectedJobId(job.id);
-                          fetchAssociatedUsernamesHandler(job.id);
-                        }}
-                        title="View Associated Usernames"
-                      >
-                        <i className="bi bi-people-fill"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mb-2">
-                    <span className={`badge bg-${job.status === 'ACTIVE' ? 'success' : 'secondary'} me-2`}>
-                      {job.status}
-                    </span>
-                    <span className="badge bg-info">{job.type}</span>
-                  </div>
-                  <p className="card-text">
-                    <small className="text-muted">
-                      <strong>Cron:</strong> {job.cron_expression}
-                      {job.start_date && (
-                        <>
-                          <br />
-                          <strong>Start Date:</strong> {new Date(job.start_date).toLocaleString()}
-                        </>
-                      )}
-                    </small>
-                  </p>
-                  
-                  {/* Filtering Settings */}
-                  {job.statuses && job.statuses.length > 0 && (
-                    <div className="mb-2">
-                      <strong className="d-block mb-1">Account Statuses:</strong>
-                      <div className="d-flex flex-wrap gap-1">
-                        {job.statuses.map((status: string) => (
-                          <span key={status} className="badge bg-primary">{status}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+            <Grid item xs={12} sm={6} md={4} key={job.id}>
+              <Box
+                sx={{
+                  border: '1px solid #ccc',
+                  borderRadius: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  p: 2,
+                  height: '100%',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start',
+                    mb: 2,
+                    flexWrap: 'wrap',
+                    gap: 1,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ mb: 0 }}>
+                    {job.name}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color={job.status === 'ACTIVE' ? 'warning' : 'success'}
+                      onClick={() => handleStatusUpdate(job.id, job.status)}
+                    >
+                      {job.status === 'ACTIVE' ? 'Stop' : 'Activate'}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="info"
+                      onClick={() => handleViewExecutions(job.id)}
+                      title="View Executions"
+                    >
+                      <i className="bi bi-eye-fill"></i>
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleEdit(job)}
+                      title="Edit Job"
+                    >
+                      <i className="bi bi-pencil-fill"></i>
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleCopy(job)}
+                      title="Copy Job"
+                    >
+                      <i className="bi bi-files"></i>
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteJob(job.id)}
+                      title="Delete Job"
+                    >
+                      <i className="bi bi-trash3-fill"></i>
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="secondary"
+                      onClick={() => {
+                        setSelectedJobId(job.id);
+                        fetchAssociatedUsernamesHandler(job.id);
+                      }}
+                      title="View Associated Usernames"
+                    >
+                      <i className="bi bi-people-fill"></i>
+                    </Button>
+                  </Box>
+                </Box>
 
-                  {/* Tags */}
-                  {job.tags && job.tags.length > 0 && (
-                    <div className="mb-2">
-                      <strong className="d-block mb-1">Tags:</strong>
-                      <div className="d-flex flex-wrap gap-1">
-                        {job.tags.map((tag: string) => (
-                          <span key={tag} className="badge bg-info">{tag}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                <Box sx={{ mb: 2 }}>
+                  <Box
+                    component="span"
+                    sx={{
+                      backgroundColor: job.status === 'ACTIVE' ? '#198754' : '#6c757d',
+                      color: '#fff',
+                      p: '2px 6px',
+                      borderRadius: '4px',
+                      mr: 1,
+                    }}
+                  >
+                    {job.status}
+                  </Box>
+                  <Box
+                    component="span"
+                    sx={{
+                      backgroundColor: '#0dcaf0',
+                      color: '#000',
+                      p: '2px 6px',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    {job.type}
+                  </Box>
+                </Box>
 
-                  {/* Sources */}
-                  {job.sources && job.sources.length > 0 && (
-                    <div className="mb-2">
-                      <strong className="d-block mb-1">Sources:</strong>
-                      <div className="d-flex flex-wrap gap-1">
-                        {job.sources.map((source: string) => (
-                          <span key={source} className="badge bg-secondary">{source}</span>
-                        ))}
-                      </div>
-                    </div>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Cron:</strong> {job.cron_expression}
+                  {job.start_date && (
+                    <>
+                      <br />
+                      <strong>Start Date:</strong>{' '}
+                      {new Date(job.start_date).toLocaleString()}
+                    </>
                   )}
+                </Typography>
 
-                  {/* Configuration Details */}
-                  {job.type == 'QUICK_ADDS' && (
-                    <div className="mb-2">
-                      <strong className="d-block mb-1">Configuration:</strong>
-                      <div className="small">
-                        {Object.entries(job.configuration)
-                          .filter(
-                            ([key]) =>
-                              ![
-                                'max_quick_add_pages',
-                                'users_sent_in_request',
-                                'argo_tokens',
-                                'batches',
-                                'batch_delay',
-                                'starting_delay'
-                              ].includes(key)
-                          )
-                          .map(([key, value]) => (
-                            <div key={key} className="mb-1 text-break">
-                              <strong>
-                                {key
-                                  .split('_')
-                                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                  .join(' ')}
-                                :
-                              </strong>{' '}
-                              {typeof value === 'boolean' ? value.toString() : String(value)}
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+                {/* Statuses */}
+                {job.statuses && job.statuses.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      Account Statuses:
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {job.statuses.map((st: string) => (
+                        <Box
+                          key={st}
+                          sx={{
+                            backgroundColor: '#0d6efd',
+                            color: '#fff',
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                          }}
+                        >
+                          {st}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Tags */}
+                {job.tags && job.tags.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      Tags:
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {job.tags.map((tag: string) => (
+                        <Box
+                          key={tag}
+                          sx={{
+                            backgroundColor: '#0dcaf0',
+                            color: '#000',
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                          }}
+                        >
+                          {tag}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Sources */}
+                {job.sources && job.sources.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      Sources:
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {job.sources.map((source: string) => (
+                        <Box
+                          key={source}
+                          sx={{
+                            backgroundColor: '#6c757d',
+                            color: '#fff',
+                            borderRadius: 1,
+                            px: 1,
+                            py: 0.5,
+                          }}
+                        >
+                          {source}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Configuration snippet example */}
+                {job.type === 'QUICK_ADDS' && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      Configuration:
+                    </Typography>
+                    <Box sx={{ fontSize: '0.85rem' }}>
+                      {Object.entries(job.configuration)
+                        .filter(
+                          ([key]) =>
+                            ![
+                              'max_quick_add_pages',
+                              'users_sent_in_request',
+                              'argo_tokens',
+                              'batches',
+                              'batch_delay',
+                              'starting_delay'
+                            ].includes(key)
+                        )
+                        .map(([key, value]) => (
+                          <Box key={key} sx={{ mb: 1 }}>
+                            <strong>
+                              {key
+                                .split('_')
+                                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                                .join(' ')}
+                              :
+                            </strong>{' '}
+                            {typeof value === 'boolean' ? value.toString() : String(value)}
+                          </Box>
+                        ))}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Grid>
           ))}
-        </div>
+        </Grid>
       )}
 
+      {/* Modal for creating/updating job */}
       <Modal show={showModal} onHide={handleClose} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>{isEditing ? 'Edit Job' : 'Create New Job'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="mb-3">
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">Job Name</label>
-            <input type="text" name="name" placeholder="Job Name" value={newJob.name} onChange={handleInputChange} className="form-control" />
-          </div>
-          
-          <div className="mb-3">
+            <input
+              type="text"
+              name="name"
+              placeholder="Job Name"
+              value={newJob.name}
+              onChange={handleInputChange}
+              className="form-control"
+            />
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">Statuses</label>
             <Select
               isMulti
@@ -948,11 +901,11 @@ const Jobs: React.FC = () => {
               className="basic-multi-select"
               classNamePrefix="select"
               onChange={handleStatusesChange}
-              value={statusesOptions.filter(option => newJob.statuses.includes(option.value))}
+              value={statusesOptions.filter((option) => newJob.statuses.includes(option.value))}
             />
-          </div>
+          </Box>
 
-          <div className="mb-3">
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">Tags</label>
             <Select
               isMulti
@@ -961,25 +914,23 @@ const Jobs: React.FC = () => {
               className="basic-multi-select"
               classNamePrefix="select"
               onChange={handleTagsChange}
-              value={tagsOptions.filter(option => newJob.tags.includes(option.value))}
+              value={tagsOptions.filter((option) => newJob.tags.includes(option.value))}
             />
-          </div>
+          </Box>
 
-          <div className="mb-3">
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">Sources</label>
             <Select
               isMulti
               options={sourcesOptions}
-              value={sourcesOptions.filter(option => 
-                newJob.sources.includes(option.value)
-              )}
+              value={sourcesOptions.filter((opt) => newJob.sources.includes(opt.value))}
               onChange={handleSourcesChange}
               className="basic-multi-select"
               classNamePrefix="select"
             />
-          </div>
+          </Box>
 
-          <div className="mb-3">
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">Cron Expression</label>
             <OverlayTrigger
               trigger="click"
@@ -987,13 +938,21 @@ const Jobs: React.FC = () => {
               overlay={
                 <Popover id="cron-popover">
                   <Popover.Body>
-                    Use <a href="https://www.freeformatter.com/cron-expression-generator-quartz.html" target="_blank" rel="noopener noreferrer">this tool</a> to generate a cron expression.
+                    Use{' '}
+                    <a
+                      href="https://www.freeformatter.com/cron-expression-generator-quartz.html"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      this tool
+                    </a>{' '}
+                    to generate a cron expression.
                   </Popover.Body>
                 </Popover>
               }
             >
-              <span className="d-inline-block">
-                <i className="bi bi-info-circle" style={{ cursor: 'pointer' }}></i>
+              <span style={{ cursor: 'pointer', marginLeft: '6px' }}>
+                <i className="bi bi-info-circle"></i>
               </span>
             </OverlayTrigger>
             <input
@@ -1004,9 +963,9 @@ const Jobs: React.FC = () => {
               onChange={handleInputChange}
               className="form-control"
             />
-          </div>
+          </Box>
 
-          <div className="mb-3">
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">Type</label>
             <Select
               name="type"
@@ -1014,25 +973,54 @@ const Jobs: React.FC = () => {
               className="basic-single"
               classNamePrefix="select"
               onChange={handleTypeChange}
-              value={typeOptions.find(option => option.value === newJob.type)}
+              value={typeOptions.find((option) => option.value === newJob.type)}
             />
-          </div>
+          </Box>
 
-          {newJob.type && configurationOptions && (
-            <div className="mb-3">
+          {/* Operation-specific config fields */}
+          {newJob.type && (
+            <Box sx={{ mb: 3 }}>
               <label className="form-label">Configuration</label>
-              <div className="card">
-                <div className="card-body">
-                  {configurationOptions}
-                </div>
-              </div>
-            </div>
+              <Box sx={{ border: '1px solid #ccc', borderRadius: 1, p: 2, mt: 1 }}>
+                {/* The same function that returns job-type UI fields */}
+                {(() => {
+                  switch (newJob.type) {
+                    case 'quick_adds':
+                      return (
+                        <Box>
+                          <label>Number of Quick Adds to Send</label>
+                          <input
+                            type="number"
+                            value={requests}
+                            onChange={(e) => setRequests(e.target.value)}
+                            className="form-control"
+                          />
+                        </Box>
+                      );
+                    case 'send_to_user':
+                      return (
+                        <Box>
+                          <label>Username</label>
+                          <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="form-control"
+                          />
+                        </Box>
+                      );
+                    default:
+                      return null;
+                  }
+                })()}
+              </Box>
+            </Box>
           )}
 
-          <div className="mb-3">
+          <Box sx={{ mb: 3 }}>
             <label className="form-label">First Execution</label>
-            <div>
-              <div className="form-check mb-2">
+            <Box sx={{ mb: 2 }}>
+              <div className="form-check">
                 <input
                   type="radio"
                   className="form-check-input"
@@ -1046,7 +1034,7 @@ const Jobs: React.FC = () => {
                   No specific time (use cron schedule)
                 </label>
               </div>
-              <div className="form-check mb-2">
+              <div className="form-check">
                 <input
                   type="radio"
                   className="form-check-input"
@@ -1060,7 +1048,7 @@ const Jobs: React.FC = () => {
                   Execute on creation
                 </label>
               </div>
-              <div className="form-check mb-2">
+              <div className="form-check">
                 <input
                   type="radio"
                   className="form-check-input"
@@ -1074,24 +1062,24 @@ const Jobs: React.FC = () => {
                   Select date and time
                 </label>
               </div>
-              {firstExecutionOption === 'datetime' && (
-                <input
-                  type="datetime-local"
-                  className="form-control mt-2"
-                  value={firstExecutionTime}
-                  onChange={(e) => setFirstExecutionTime(e.target.value)}
-                />
-              )}
-            </div>
-          </div>
+            </Box>
+            {firstExecutionOption === 'datetime' && (
+              <input
+                type="datetime-local"
+                className="form-control"
+                value={firstExecutionTime}
+                onChange={(e) => setFirstExecutionTime(e.target.value)}
+              />
+            )}
+          </Box>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <RBButton variant="secondary" onClick={handleClose}>
             Cancel
-          </Button>
-          <Button variant="primary" onClick={handleCreateOrUpdateJob}>
+          </RBButton>
+          <RBButton variant="primary" onClick={handleCreateOrUpdateJob}>
             {isEditing ? 'Update Job' : 'Create Job'}
-          </Button>
+          </RBButton>
         </Modal.Footer>
       </Modal>
 
@@ -1105,10 +1093,10 @@ const Jobs: React.FC = () => {
               {associatedUsernames.map((account, index) => (
                 <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                   <span>{account.username}</span>
-                  <a  
+                  <a
                     href={`/agency/${agencyId}/snapchat-account/${account.id}`}
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="btn btn-outline-primary btn-sm"
                   >
                     View Profile
@@ -1121,13 +1109,13 @@ const Jobs: React.FC = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowUsernamesModal(false)}>
+          <RBButton variant="secondary" onClick={() => setShowUsernamesModal(false)}>
             Close
-          </Button>
+          </RBButton>
         </Modal.Footer>
       </Modal>
-    </div>
+    </Box>
   );
 };
 
-export default Jobs; 
+export default Jobs;

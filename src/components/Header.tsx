@@ -69,7 +69,7 @@ const Header: React.FC<HeaderProps> = ({
     <AppBar
       position="static"
       sx={{
-        background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+        background: 'linear-gradient(45deg, #121d27 30%, #19798c 90%)',
         boxShadow: 3,
       }}
     >

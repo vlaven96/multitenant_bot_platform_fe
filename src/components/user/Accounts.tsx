@@ -12,28 +12,36 @@ import {
   GridFooterContainer,
   GridFooter
 } from '@mui/x-data-grid';
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-
-import InfoModal from '../Modal';
-import AddAccountModal from './modals/AddAccountModal';
-import TerminateAccountsModal from './modals/TerminateAccountsModal';
-import TagCell from '../common/TagCell';
+import 'react-toastify/dist/ReactToastify.css'; // Still used for notifications
 
 import {
   fetchAccounts,
   terminateAccount,
   updateAccount,
   fetchTerminationCandidates,
-  terminateMultipleAccounts
+  terminateMultipleAccounts,
+  bulkUpdateAccounts
 } from '../../services/accountsService';
 import { fetchTags } from '../../services/tagsService';
-import { bulkUpdateAccounts } from '../../services/accountsService'; // Bulk update service
-import BulkUpdateModal from './modals/BulkUpdateModal'; // Import new BulkUpdateModal
 
-import './Accounts.css';
+import InfoModal from '../Modal';
+import AddAccountModal from './modals/AddAccountModal';
+import TerminateAccountsModal from './modals/TerminateAccountsModal';
+import BulkUpdateModal from './modals/BulkUpdateModal';
+import TagCell from '../common/TagCell';
+
+// If you still want to keep Bootstrap for other parts of your app, leave this import.
+// Otherwise, you can remove it if you're moving fully to MUI.
+// import 'bootstrap/dist/css/bootstrap.min.css';
+
+// MUI components for layout & styling:
+import { Box, Button, Typography } from '@mui/material';
+
+// You mentioned colors – if you're using them directly, keep them, or remove if not needed
+import { MAIN_COLOR_1, MAIN_COLOR_2, MAIN_COLOR_3, MAIN_COLOR_4, MAIN_COLOR_5 } from '../../colors';
 
 // Define the Account interface
 interface Account {
@@ -44,19 +52,15 @@ interface Account {
   two_fa_secret?: string;
   creation_date?: string;
   added_to_system_date?: string;
-  proxy?: { id: number; host: string };
-  // device?: { data: string };
-  // cookies?: { data: string };
+  proxy?: { id: number; host: string; port?: number };
   account_executions?: { status: string }[];
-  // model?: { id: number; name: string };
-  // chat_bot?: { id: number; type: string };
   status?: string;
   tags?: string[];
   account_source?: string;
   workflow_id?: string;
 }
 
-// Custom MUI DataGrid toolbar
+/** Custom MUI DataGrid toolbar, same logic as before. */
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
@@ -68,14 +72,14 @@ function CustomToolbar() {
   );
 }
 
-// Custom footer for row counts, pagination, etc.
+/** Custom DataGrid footer, same logic as before. */
 function CustomFooter() {
   return (
     <GridFooterContainer>
       <GridFooter />
-      <div style={{ marginLeft: '16px', fontWeight: 'bold' }}>
+      <Box ml={2} fontWeight="bold">
         {/* Additional row count or custom info can go here */}
-      </div>
+      </Box>
     </GridFooterContainer>
   );
 }
@@ -94,11 +98,6 @@ function Accounts() {
     Array<{ id: string; username: string; status: string }>
   >([]);
 
-  // For dropdown example (not strictly needed for the new feature)
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
-
-  // For bulk update
   const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
 
   // Selected rows in the DataGrid
@@ -107,7 +106,7 @@ function Accounts() {
   // For TagCell
   const [existingTags, setExistingTags] = useState<string[]>([]);
 
-  // For columnVisibilityModel in MUI DataGrid
+  // Column visibility localStorage logic (unchanged)
   const initialColumnVisibility = () => {
     const savedConfig = localStorage.getItem('columnVisibilityConfig');
     if (savedConfig) {
@@ -116,28 +115,26 @@ function Accounts() {
     // Default: all columns visible
     return {
       username: true,
-      model: true,
-      chat_bot: true,
       password: true,
       snapchat_link: true,
+      email: true,
+      email_password: true,
       two_fa_secret: true,
       creation_date: true,
       added_to_system_date: true,
       proxy: true,
-      device: true,
-      cookies: true,
       status: true,
       account_source: true,
       tags: true,
-      account_executions: true,
-      actions: true, // for the actions column
       workflow: true,
+      account_executions: true,
+      actions: true,
     };
   };
   const [columnVisibilityModel, setColumnVisibilityModel] =
     useState<Record<string, boolean>>(initialColumnVisibility);
 
-  // Load accounts on mount
+  // -------------- Original Effects and logic remain --------------
   useEffect(() => {
     const loadAccounts = async () => {
       if (!agencyId) {
@@ -154,7 +151,6 @@ function Accounts() {
     loadAccounts();
   }, [agencyId]);
 
-  // Load tags
   useEffect(() => {
     const loadTags = async () => {
       try {
@@ -171,7 +167,6 @@ function Accounts() {
     loadTags();
   }, [agencyId]);
 
-  // Save column visibility to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('columnVisibilityConfig', JSON.stringify(columnVisibilityModel));
   }, [columnVisibilityModel]);
@@ -208,7 +203,8 @@ function Accounts() {
         position: 'top-right',
         autoClose: 3000
       });
-      // Optionally refresh the accounts list
+
+      // Refresh the accounts list
       const data = await fetchAccounts(agencyId, () => {});
       setAccounts(data);
     } catch (error) {
@@ -226,18 +222,17 @@ function Accounts() {
         console.error('Agency ID is undefined');
         return;
       }
-      // 1. Call your updateAccount or similar service
       await updateAccount(agencyId, rowId, {
         tags: newTags
       });
 
-      // 2. Merge newly created tags into existingTags
+      // Merge newly created tags into existingTags
       const newlyCreated = newTags.filter((t) => !existingTags.includes(t));
       if (newlyCreated.length > 0) {
         setExistingTags((prev) => [...prev, ...newlyCreated]);
       }
 
-      // 3. Update only the specific row data in accounts
+      // Update the specific row data
       setAccounts((prev) =>
         prev.map((acc) => (acc.id === rowId ? { ...acc, tags: newTags } : acc))
       );
@@ -260,8 +255,10 @@ function Accounts() {
     try {
       await terminateMultipleAccounts(agencyId, selectedAccountIds);
       setIsTerminateModalOpen(false);
+
       const data = await fetchAccounts(agencyId, () => {});
       setAccounts(data);
+
       toast.success('Selected accounts have been terminated successfully', {
         position: 'top-right',
         autoClose: 3000
@@ -276,10 +273,6 @@ function Accounts() {
     }
   };
 
-  /**
-   * Handler for Bulk Update from the modal.
-   * Receives an object with the new status, tagsToAdd, tagsToRemove, etc.
-   */
   const handleBulkUpdate = async (updates: {
     status?: string;
     tagsToAdd?: string[];
@@ -296,11 +289,9 @@ function Accounts() {
       console.error('Agency ID is undefined');
       return;
     }
-    const selectedIds = [...selectionModel];
-    console.log("Selected IDs: ", selectedIds);
     try {
       await bulkUpdateAccounts(agencyId, {
-        account_ids: selectionModel.map(id => parseInt(id)), // Convert string IDs to numbers
+        account_ids: selectionModel.map((id) => parseInt(id, 10)),
         status: updates.status,
         tags_to_add: updates.tagsToAdd,
         tags_to_remove: updates.tagsToRemove,
@@ -313,13 +304,12 @@ function Accounts() {
         autoClose: 3000
       });
       setIsBulkUpdateModalOpen(false);
-      
 
-      // Reload the accounts to reflect changes
+      // Reload accounts
       const data = await fetchAccounts(agencyId, () => {});
-      // Now modify the re-fetched data to reflect the new tags
+      // Reflect new tags
       const updatedAccounts = data.map((account) => {
-        if (selectedIds.includes(account.id)) {
+        if (selectionModel.includes(account.id)) {
           const newTags = new Set(account.tags || []);
           updates.tagsToAdd?.forEach((tag) => newTags.add(tag));
           updates.tagsToRemove?.forEach((tag) => newTags.delete(tag));
@@ -329,7 +319,6 @@ function Accounts() {
       });
       setAccounts(updatedAccounts);
 
-      // Clear the selection so the grid reflects no rows selected
       setSelectionModel([]);
     } catch (error: any) {
       const errorMessage =
@@ -339,7 +328,7 @@ function Accounts() {
     }
   };
 
-  // Define MUI DataGrid columns
+  // Same DataGrid columns as before
   const columns: GridColDef<Account>[] = useMemo(
     () => [
       {
@@ -362,26 +351,6 @@ function Accounts() {
           );
         },
       },
-      // {
-      //   field: 'model',
-      //   headerName: 'Model',
-      //   flex: 1,
-      //   sortable: true,
-      //   filterable: true,
-      //   valueGetter: (params: GridValueGetterParams<Account, any>) => {
-      //     return params?.name || 'Not Available';
-      //   },
-      // },
-      // {
-      //   field: 'chat_bot',
-      //   headerName: 'ChatBot',
-      //   flex: 1,
-      //   sortable: true,
-      //   filterable: true,
-      //   valueGetter: (params: GridValueGetterParams<Account, any>) => {
-      //     return params?.type || 'Not Available';
-      //   },
-      // },
       {
         field: 'password',
         headerName: 'Password',
@@ -399,7 +368,7 @@ function Accounts() {
           const link = params.row.snapchat_link;
           if (!link) return 'Not Available';
           return (
-            <a href={link} target="_blank" rel="noopener noreferrer" className="snapchat-link">
+            <a href={link} target="_blank" rel="noopener noreferrer" style={{ color: 'teal' }}>
               {link}
             </a>
           );
@@ -419,7 +388,6 @@ function Accounts() {
         sortable: true,
         filterable: true,
       },
-
       {
         field: 'two_fa_secret',
         headerName: '2FA Secret',
@@ -450,50 +418,14 @@ function Accounts() {
           const proxy = params.row.proxy;
           return (
             <span
-              className="clickable-cell"
-              role="button"
+              style={{ color: 'blue', cursor: 'pointer' }}
               onClick={() => openModal(proxy ? JSON.stringify(proxy, null, 2) : 'Not Associated')}
             >
-              {proxy ? `${proxy.host}:${proxy.port}` : 'Not Associated'}
+              {proxy ? `${proxy.host}:${proxy.port ?? ''}` : 'Not Associated'}
             </span>
           );
         },
       },
-      // {
-      //   field: 'device',
-      //   headerName: 'Device Model',
-      //   flex: 1,
-      //   renderCell: (params: GridRenderCellParams<Account>) => {
-      //     const device = params.row.device;
-      //     if (!device) return 'Not Associated';
-      //     try {
-      //       const deviceObj = JSON.parse(device.data);
-      //       return (
-      //         <span className="clickable-cell" onClick={() => openModal(device.data)}>
-      //           {deviceObj.device_model || 'Unknown Model'}
-      //         </span>
-      //       );
-      //     } catch {
-      //       return 'Invalid Device Data';
-      //     }
-      //   },
-      // },
-      // {
-      //   field: 'cookies',
-      //   headerName: 'Cookies',
-      //   flex: 1,
-      //   renderCell: (params: GridRenderCellParams<Account>) => {
-      //     const cookies = params.row.cookies;
-      //     return (
-      //       <span
-      //         className="clickable-cell"
-      //         onClick={() => openModal(cookies ? cookies.data : 'Not Associated')}
-      //       >
-      //         {cookies ? 'View Cookies' : 'Not Associated'}
-      //       </span>
-      //     );
-      //   },
-      // },
       {
         field: 'status',
         headerName: 'Status',
@@ -502,21 +434,25 @@ function Accounts() {
         filterable: true,
         renderCell: (params: GridRenderCellParams<Account>) => {
           const status = params.row.status;
-          const getStatusClass = (st: string | undefined) => {
+          const getStatusColor = (st: string | undefined) => {
             switch (st) {
               case 'RECENTLY_INGESTED':
-                return 'status-recently-ingested';
+                return '#17a2b8'; // Just a sample color
               case 'GOOD_STANDING':
-                return 'status-good-standing';
+                return '#28a745';
               case 'LOCKED':
-                return 'status-locked';
+                return '#ffc107';
               case 'TERMINATED':
-                return 'status-terminated';
+                return '#dc3545';
               default:
-                return 'status-unknown';
+                return '#6c757d';
             }
           };
-          return <span className={getStatusClass(status)}>{status || 'Unknown'}</span>;
+          return (
+            <span style={{ color: getStatusColor(status), fontWeight: 'bold' }}>
+              {status || 'Unknown'}
+            </span>
+          );
         },
       },
       {
@@ -525,7 +461,18 @@ function Accounts() {
         flex: 1,
         renderCell: (params: GridRenderCellParams<Account>) => {
           const value = params.row.account_source;
-          return <span className="badge bg-info">{value || 'N/A'}</span>;
+          return (
+            <span
+              style={{
+                background: '#0dcaf0',
+                padding: '4px 6px',
+                borderRadius: '4px',
+                color: '#000'
+              }}
+            >
+              {value || 'N/A'}
+            </span>
+          );
         },
       },
       {
@@ -567,14 +514,14 @@ function Accounts() {
               case 'FAILURE':
                 return 'red';
               case undefined:
-                return 'grey';
+                return 'gray';
               default:
                 return 'yellow';
             }
           };
           return (
-            <div
-              className="clickable-cell"
+            <span
+              style={{ cursor: 'pointer' }}
               onClick={() => openModal(JSON.stringify(executions, null, 2))}
             >
               {[2, 1, 0].map((idx) => (
@@ -590,7 +537,7 @@ function Accounts() {
                   }}
                 />
               ))}
-            </div>
+            </span>
           );
         },
       },
@@ -603,118 +550,130 @@ function Accounts() {
         renderCell: (params: GridRenderCellParams<Account>) => {
           const row = params.row;
           return (
-            <div className="d-flex gap-2">
-              <button
+            <Box display="flex" gap={1}>
+              <Button
+                variant="contained"
+                size="small"
                 onClick={() => navigate(`/agency/${agencyId}/accounts/edit/${row.id}`)}
-                className="btn btn-sm btn-primary"
-                style={{ padding: '4px 8px', fontSize: '12px' }}
               >
                 Edit
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                size="small"
                 onClick={() => terminateAccountHandler(row.id)}
-                className="btn btn-sm btn-danger"
-                style={{ padding: '4px 8px', fontSize: '12px' }}
               >
                 Terminate
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="contained"
+                color="info"
+                size="small"
                 onClick={() => navigate(`/snapchat-account/${row.id}`)}
-                className="btn btn-sm btn-info"
-                style={{ padding: '4px 8px', fontSize: '12px' }}
               >
                 View Details
-              </button>
-            </div>
+              </Button>
+            </Box>
           );
         },
       },
     ],
-    [navigate, terminateAccountHandler, openModal, existingTags]
+    [agencyId, navigate, terminateAccountHandler, openModal, existingTags]
   );
 
   return (
     <>
-      <div className="container-fluid vh-100 d-flex flex-column">
-        <div className="row flex-grow-1">
-          <div className="col d-flex flex-column">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h1>Accounts Management (MUI DataGrid)</h1>
-              <div className="d-flex gap-2">
-                <button onClick={handleOpenTerminateModal} className="btn btn-danger">
-                  Terminate Accounts
-                </button>
-                <button onClick={() => setIsAddAccountModalOpen(true)} className="btn btn-primary">
-                  Add Accounts
-                </button>
-                <button
-                  onClick={() => setIsBulkUpdateModalOpen(true)}
-                  className="btn btn-warning"
-                  disabled={selectionModel.length === 0}
-                >
-                  Bulk Update
-                </button>
-              </div>
-            </div>
+      {/* Replace container-fluid + rows + columns with MUI Box components for layout */}
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          p: 2,
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h5">Accounts Management (MUI DataGrid)</Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button variant="contained" color="error" onClick={handleOpenTerminateModal}>
+              Terminate Accounts
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setIsAddAccountModalOpen(true)}
+            >
+              Add Accounts
+            </Button>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => setIsBulkUpdateModalOpen(true)}
+              disabled={selectionModel.length === 0}
+            >
+              Bulk Update
+            </Button>
+          </Box>
+        </Box>
 
-            <div className="table-container flex-grow-1" style={{ width: '100%' }}>
-              <DataGrid
-                rows={accounts}
-                columns={columns}
-                getRowId={(row) => row.id}
-                disableSelectionOnClick
-                autoHeight={false}
-                checkboxSelection
-                onRowSelectionModelChange={(newSelection) => {
-                  // newSelection is typically an array of selected row IDs
-                  setSelectionModel(newSelection as string[]);
-                }}
-                rowSelectionModel={selectionModel}
-                components={{
-                  Toolbar: CustomToolbar,
-                  Footer: CustomFooter,
-                }}
-                columnVisibilityModel={columnVisibilityModel}
-                onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
-                pagination
-                pageSize={20}
-                rowsPerPageOptions={[20, 50, 100]}
-              />
-            </div>
+        {/* This replaces the .table-container + flex-grow-1 */}
+        <Box sx={{ flexGrow: 1, width: '100%' }}>
+          <DataGrid
+            rows={accounts}
+            columns={columns}
+            getRowId={(row) => row.id}
+            disableSelectionOnClick
+            checkboxSelection
+            onRowSelectionModelChange={(newSelection) => {
+              setSelectionModel(newSelection as string[]);
+            }}
+            rowSelectionModel={selectionModel}
+            components={{
+              Toolbar: CustomToolbar,
+              Footer: CustomFooter,
+            }}
+            columnVisibilityModel={columnVisibilityModel}
+            onColumnVisibilityModelChange={(newModel) => setColumnVisibilityModel(newModel)}
+            pagination
+            pageSize={20}
+            rowsPerPageOptions={[20, 50, 100]}
+          />
+        </Box>
+      </Box>
 
-            {/* Info Modal */}
-            <InfoModal
-              isOpen={isModalOpen}
-              onRequestClose={() => setIsModalOpen(false)}
-              content={modalContent}
-            />
+      {/* Info Modal */}
+      <InfoModal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        content={modalContent}
+      />
 
-            {/* Add Account Modal */}
-            <AddAccountModal
-              isOpen={isAddAccountModalOpen}
-              onRequestClose={() => setIsAddAccountModalOpen(false)}
-              agencyId={agencyId || ''}
-            />
+      {/* Add Account Modal */}
+      <AddAccountModal
+        isOpen={isAddAccountModalOpen}
+        onRequestClose={() => setIsAddAccountModalOpen(false)}
+        agencyId={agencyId || ''}
+      />
 
-            {/* Terminate Accounts Modal */}
-            <TerminateAccountsModal
-              isOpen={isTerminateModalOpen}
-              onClose={() => setIsTerminateModalOpen(false)}
-              accounts={terminationCandidates}
-              onConfirm={handleTerminateAccounts}
-            />
+      {/* Terminate Accounts Modal */}
+      <TerminateAccountsModal
+        isOpen={isTerminateModalOpen}
+        onClose={() => setIsTerminateModalOpen(false)}
+        accounts={terminationCandidates}
+        onConfirm={handleTerminateAccounts}
+      />
 
-            {/* Bulk Update Modal */}
-            <BulkUpdateModal
-              isOpen={isBulkUpdateModalOpen}
-              onClose={() => setIsBulkUpdateModalOpen(false)}
-              onConfirm={handleBulkUpdate}
-              agencyId={agencyId || ''}
-            />
-          </div>
-        </div>
-      </div>
+      {/* Bulk Update Modal */}
+      <BulkUpdateModal
+        isOpen={isBulkUpdateModalOpen}
+        onClose={() => setIsBulkUpdateModalOpen(false)}
+        onConfirm={handleBulkUpdate}
+        agencyId={agencyId || ''}
+      />
+
       {/* Toast container for notifications */}
+      <ToastContainer />
     </>
   );
 }
