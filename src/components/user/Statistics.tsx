@@ -268,9 +268,9 @@ const Statistics: React.FC = () => {
                   <ListItem>
                     <ListItemText primary="Quick Adds Sent" secondary={statistics?.quick_ads_sent || 'N/A'} />
                   </ListItem>
-                  <ListItem>
+                  {/* <ListItem>
                     <ListItemText primary="Generated Leads" secondary={statistics?.generated_leads || 'N/A'} />
-                  </ListItem>
+                  </ListItem> */}
                   <ListItem>
                     <ListItemText primary="Total Conversations" secondary={
                       <>
