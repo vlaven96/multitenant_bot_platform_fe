@@ -639,7 +639,7 @@ function Accounts() {
         <div className="row flex-grow-1">
           <div className="col d-flex flex-column">
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h1>Accounts Management (MUI DataGrid)</h1>
+              <h1>Accounts Management</h1>
               <div className="d-flex gap-2">
                 <button onClick={handleOpenTerminateModal} className="btn btn-danger">
                   Terminate Accounts
