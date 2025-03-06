@@ -26,12 +26,18 @@ import Workflows from './components/user/workflow/Workflows';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Statistics from './components/user/Statistics';
 import RegisterAgency from './components/RegisterAgency';
+import RegisterNewAgency from './components/RegisterNewAgency';
 import RegisterUser from './components/RegisterUser';
 import Subscription from './components/admin/Subscription';
 import GlobalAdminHome from './components/global_admin/GlobalAdminHome';
 
 // --- NEW: import the wrapper component that captures :agencyId and updates state ---
 import AgencyIdCapture from './components/AgencyIdCapture';
+
+// Create a PublicRoute component
+const PublicRoute = ({ children, isAuthenticated }: { children: JSX.Element, isAuthenticated: boolean }) => {
+  return isAuthenticated ? <Navigate to="/" /> : children;
+};
 
 function App() {
   // Track auth in React state
@@ -70,11 +76,38 @@ function App() {
 
       <Routes>
         {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        {/* If you still need the old register route: */}
-        {/* <Route path="/register" element={<Register />} /> */}
-        <Route path="/register-agency" element={<RegisterAgency />} />
-        <Route path="/register" element={<RegisterUser />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register-agency"
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <RegisterAgency />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register-new-agency"
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <RegisterNewAgency />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute isAuthenticated={isAuthenticated}>
+              <RegisterUser />
+            </PublicRoute>
+          }
+        />
 
         {/* 
           For each route that includes /agency/:agencyId,

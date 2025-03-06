@@ -1,71 +1,36 @@
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography } from '@mui/material';
-import { registerAgency } from '../services/agencyService';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
+import React from 'react';
+import { Container, Typography, Button, Box, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-function RegisterAgency() {
-  const [agencyName, setAgencyName] = useState('');
-  const [agencyEmail, setAgencyEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
+const RegisterAgency: React.FC = () => {
   const navigate = useNavigate();
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const handleRegister = async () => {
-    if (!validateEmail(agencyEmail)) {
-      setEmailError('Please enter a valid email address.');
-      return;
-    }
-    setEmailError('');
-    try {
-      const result = await registerAgency(agencyName, agencyEmail);
-      console.log('Agency registered successfully:', result);
-      toast.success('A confirmation email was sent to your email address.');
-      navigate('/');
-    } catch (error) {
-      console.error('Failed to register agency:', error);
-      toast.error('Failed to register agency. Please try again.');
-    }
+  const handleGoToMainMenu = () => {
+    navigate('/');
   };
 
   return (
-    <Container maxWidth="sm" className="d-flex flex-column align-items-center mt-5">
-      <Typography variant="h4" component="h1" gutterBottom>
+    <Container maxWidth="sm" sx={{ textAlign: 'center', mt: 5 }}>
+      <Typography variant="h4" gutterBottom>
         Register New Agency
       </Typography>
-      <TextField
-        label="Agency Name"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={agencyName}
-        onChange={(e) => setAgencyName(e.target.value)}
-      />
-      <TextField
-        label="Agency Email"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={agencyEmail}
-        onChange={(e) => setAgencyEmail(e.target.value)}
-        error={!!emailError}
-        helperText={emailError}
-      />
+      <Typography variant="body1" sx={{ mb: 3 }}>
+        We are not accepting new agency registrations at the moment. For inquiries, please contact{' '}
+        <Link href="https://t.me/snepflow" target="_blank" rel="noopener noreferrer">
+          SnepFlow
+        </Link>{' '}
+        on Telegram.
+      </Typography>
       <Button
         variant="contained"
         color="primary"
-        onClick={handleRegister}
-        className="mt-3"
+        onClick={handleGoToMainMenu}
       >
-        Register
+        Go to Main Menu
       </Button>
     </Container>
   );
-}
+};
 
 export default RegisterAgency; 

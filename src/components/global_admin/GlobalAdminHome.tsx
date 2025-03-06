@@ -16,6 +16,8 @@ import { fetchAllAgencies } from '../../services/agencyService';
 import { createSubscription, updateSubscription, renewSubscription } from '../../services/subscriptionService';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { inviteAgency } from '../../services/agencyService';
+// import { sendAgencyInvite } from '../../services/agencyService';
 
 interface Subscription {
   id: number;
@@ -64,6 +66,8 @@ const GlobalAdminHome: React.FC = () => {
   const [modalType, setModalType] = useState<'create' | 'update' | 'renew' | null>(null);
   const [selectedAgency, setSelectedAgency] = useState<Agency | null>(null);
   const [formData, setFormData] = useState({ daysAvailable: '', numberOfSloths: '', price: '', status: '', endDate: '' });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
 
   const loadAgencies = async () => {
     try {
@@ -97,6 +101,8 @@ const GlobalAdminHome: React.FC = () => {
     setOpen(false);
     setModalType(null);
     setSelectedAgency(null);
+    setModalOpen(false);
+    setEmail('');
   };
 
   const handleSubmit = async () => {
@@ -125,6 +131,29 @@ const GlobalAdminHome: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleOpenInviteModal = () => {
+    setModalOpen(true);
+  };
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSendInvite = async () => {
+    if (!validateEmail(email)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    try {
+      await inviteAgency(email);
+      toast.success('Invite sent successfully!');
+      handleCloseModal();
+    } catch (error) {
+      console.error('Failed to send invite:', error);
+      toast.error('Failed to send invite. Please try again.');
+    }
   };
 
   const columns: GridColDef<Agency>[] = [
@@ -291,6 +320,10 @@ const GlobalAdminHome: React.FC = () => {
         Global Admin Dashboard
       </Typography>
 
+      <Button variant="contained" color="primary" onClick={handleOpenInviteModal} sx={{ mb: 2 }}>
+        Send Invite to New Agency
+      </Button>
+
       {loading ? (
         <CircularProgress />
       ) : (
@@ -382,6 +415,29 @@ const GlobalAdminHome: React.FC = () => {
           </Button>
           <Button onClick={handleSubmit} color="primary">
             Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={modalOpen} onClose={handleCloseModal}>
+        <DialogTitle>Send Invite to New Agency</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Email Address"
+            type="email"
+            fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSendInvite} color="primary">
+            Send Invite
           </Button>
         </DialogActions>
       </Dialog>

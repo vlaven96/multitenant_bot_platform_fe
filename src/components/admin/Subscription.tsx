@@ -85,8 +85,8 @@ const Subscription: React.FC = () => {
         </Typography>
         <Typography variant="body2" color="text.secondary" style={{ marginTop: '16px' }}>
           For renewals or modifications, please contact{' '}
-          <Link href="https://t.me/epicuruus" target="_blank" rel="noopener noreferrer">
-            Epicuruus
+          <Link href="https://t.me/snepflow" target="_blank" rel="noopener noreferrer">
+            Snep
           </Link> on Telegram.
         </Typography>
       </CardContent>

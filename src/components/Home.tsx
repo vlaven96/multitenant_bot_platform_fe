@@ -42,7 +42,7 @@ function Home() {
         </Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
           We offer a single subscription model: 
-          <strong> $30 per spot / month</strong>. Each spot entitles you to keep
+          <strong> $25 per spot / month</strong>. Each spot entitles you to keep
           <em> one active, good-standing Snapchat account</em> running with
           unlimited operations. If an account gets locked or banned, you can
           reassign its spot to another account at no extra cost.
