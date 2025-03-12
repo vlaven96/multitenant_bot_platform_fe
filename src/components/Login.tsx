@@ -51,7 +51,6 @@ function Login() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <ToastContainer />
       <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
         <Typography component="h1" variant="h5" align="center" gutterBottom>
           Sign In

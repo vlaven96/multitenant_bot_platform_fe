@@ -765,7 +765,6 @@ const Jobs: React.FC = () => {
 
   return (
     <div className="container-fluid p-4">
-      <ToastContainer />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Jobs</h1>
         <Button variant="primary" onClick={handleShow}>

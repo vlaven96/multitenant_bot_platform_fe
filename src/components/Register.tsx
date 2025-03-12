@@ -42,7 +42,6 @@ function Register() {
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
-      <ToastContainer />
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow">
         <div className="mb-3">
           <input

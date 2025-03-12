@@ -281,7 +281,6 @@ const EditSnapchatAccount: React.FC = () => {
           </button>
         </div>
       </form>
-      <ToastContainer />
     </div>
   );
 };

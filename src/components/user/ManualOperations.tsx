@@ -707,7 +707,6 @@ const ManualOperations: React.FC = () => {
 
   return (
     <div className="container-fluid vh-100 d-flex flex-column">
-      <ToastContainer />
 
       {/* Operation selection & parameters */}
       <div className="operation-select mb-3">

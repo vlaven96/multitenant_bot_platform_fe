@@ -442,7 +442,6 @@ const GlobalAdminHome: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      <ToastContainer />
     </Container>
   );
 };
