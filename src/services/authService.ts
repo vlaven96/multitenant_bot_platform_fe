@@ -73,7 +73,10 @@ export const completeRegistration = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error completing registration:", error);
-    throw error;
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Error registering user");
+    } else {
+      throw new Error("Error registering user");
+    }
   }
 };

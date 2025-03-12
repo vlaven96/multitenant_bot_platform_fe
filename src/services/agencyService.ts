@@ -2,6 +2,26 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL; // Replace with your actual API URL
 
+
+export const registerAgencyOld = async (name: string, agencyEmail: string) => {
+  try {
+    console.log(API_URL);
+    const response = await axios.post(`${API_URL}/agencies/`, {
+      name,
+      agency_email: agencyEmail,
+      admin_role: "ADMIN",
+
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Error registering agency");
+    } else {
+      throw new Error("Error registering agency");
+    }
+  }
+};
+
 export const registerAgency = async (
   name: string,
   username: string,
@@ -18,7 +38,6 @@ export const registerAgency = async (
     });
     return response.data;
   } catch (error: any) {
-    console.error("Error registering agency:", error);
     if (axios.isAxiosError(error) && error.response) {
       // Propagate the error response from the server
       throw new Error(error.response.data.detail || "Error registering agency");

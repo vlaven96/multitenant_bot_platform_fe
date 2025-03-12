@@ -92,14 +92,14 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/register-new-agency"
           element={
             <PublicRoute isAuthenticated={isAuthenticated}>
               <RegisterNewAgency />
             </PublicRoute>
           }
-        />
+        /> */}
         <Route
           path="/register"
           element={

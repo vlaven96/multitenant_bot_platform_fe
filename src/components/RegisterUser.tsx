@@ -38,9 +38,9 @@ function RegisterUser() {
       console.log('User registered successfully:', result);
       toast.success('User registered successfully.');
       navigate('/'); // Redirect to home page
-    } catch (error) {
-      console.error('Failed to register user:', error);
-      toast.error('Failed to register user. Please try again.');
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to register agency. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
